@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Controle de Estoque</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <header class="header">
+
+        <div>
+            <h1>📦 Controle de Estoque</h1>
+            <p>Gerencie os produtos do seu mercado</p>
+        </div>
+
+    </header>
+
+
+    <main class="container">
+<!-- DASHBOARD -->
+
+<section class="dashboard">
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-icone">
+            📦
+        </div>
+
+        <div>
+            <span class="dashboard-label">
+                Produtos cadastrados
+            </span>
+
+            <strong id="totalProdutos">
+                0
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-icone">
+            📊
+        </div>
+
+        <div>
+            <span class="dashboard-label">
+                Itens em estoque
+            </span>
+
+            <strong id="totalItens">
+                0
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-icone">
+            ⚠️
+        </div>
+
+        <div>
+            <span class="dashboard-label">
+                Estoque baixo
+            </span>
+
+            <strong id="estoqueBaixo">
+                0
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-icone">
+            🔴
+        </div>
+
+        <div>
+            <span class="dashboard-label">
+                Sem estoque
+            </span>
+
+            <strong id="semEstoque">
+                0
+            </strong>
+        </div>
+
+    </div>
+<div class="dashboard-card">
+
+    <div class="dashboard-icone">
+        💰
+    </div>
+
+    <div>
+        <span class="dashboard-label">
+            Valor em estoque
+        </span>
+
+        <strong id="valorEstoque">
+            R$ 0,00
+        </strong>
+    </div>
+
+</div>
+</section>
+        <!-- FORMULÁRIO -->
+
+        <section class="card">
+
+            <div class="card-header">
+                <div>
+                    <h2>Adicionar produto</h2>
+                    <p>Cadastre um novo produto no estoque.</p>
+                </div>
+            </div>
+
+            <form id="produtoForm">
+
+                <div class="form-grid">
+
+                    <div class="campo">
+                        <label for="nome">
+                            Nome do produto
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nome"
+                            placeholder="Ex: Arroz 5kg"
+                            required
+                        >
+                    </div>
+
+
+                  <div class="campo">
+
+    <label for="categoria">
+        Categoria
+    </label>
+
+    <select id="categoria" required>
+
+        <option value="">
+            Carregando categorias...
+        </option>
+
+    </select>
+
+</div>
+
+
+                    <div class="campo">
+                        <label for="preco">
+                            Preço
+                        </label>
+
+                        <input
+                            type="number"
+                            id="preco"
+                            placeholder="0,00"
+                            step="0.01"
+                            min="0"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="campo">
+                        <label for="quantidade">
+                            Quantidade inicial
+                        </label>
+
+                        <input
+                            type="number"
+                            id="quantidade"
+                            placeholder="Ex: 20"
+                            min="0"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="campo">
+                        <label for="sku">
+                            Código / SKU
+                        </label>
+
+                        <input
+                            type="text"
+                            id="sku"
+                            placeholder="Ex: ARZ001"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    + Cadastrar produto
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- ESTOQUE -->
+
+        <section class="card">
+
+            <div class="estoque-topo">
+
+                <div>
+                    <h2>Estoque atual</h2>
+                    <p id="contador">
+                        0 produtos cadastrados
+                    </p>
+                </div>
+
+
+                <div class="pesquisa">
+
+                    <span>🔎</span>
+
+                    <input
+                        type="text"
+                        id="pesquisa"
+                        placeholder="Pesquisar produto ou SKU..."
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="mensagem"
+                class="mensagem"
+            ></div>
+
+
+            <div class="tabela-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Produto</th>
+                            <th>Categoria</th>
+                            <th>SKU</th>
+                            <th>Preço</th>
+                            <th>Quantidade</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="tabelaProdutos">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div
+                id="semProdutos"
+                class="sem-produtos"
+            >
+                <div>📦</div>
+
+                <h3>Nenhum produto encontrado</h3>
+
+                <p>
+                    Cadastre seu primeiro produto usando
+                    o formulário acima.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+<!-- GERENCIAMENTO DE CATEGORIAS -->
+
+<section class="card categorias-card">
+
+    <div class="estoque-topo">
+
+        <div>
+            <h2>📂 Gerenciar categorias</h2>
+
+            <p>
+                Adicione, edite ou exclua categorias do estoque.
+            </p>
+        </div>
+
+        <button
+    type="button"
+    id="btnNovaCategoria"
+    class="btn btn-primary"
+>
+    + Nova categoria
+</button>
+    </div>
+
+
+    <div
+        id="listaCategorias"
+        class="lista-categorias"
+    >
+
+        <!-- As categorias serão carregadas aqui -->
+
+    </div>
+
+</section>
+<!-- HISTÓRICO DE MOVIMENTAÇÕES -->
+
+<section class="card historico-card">
+
+```
+<div class="estoque-topo">
+
+    <div>
+        <h2>📋 Histórico de movimentações</h2>
+
+        <p>
+            Consulte as entradas e saídas realizadas no estoque.
+        </p>
+    </div>
+
+</div>
+
+
+<!-- FILTROS -->
+
+<div class="filtros-movimentacoes">
+
+    <div class="campo-filtro">
+
+        <label for="filtroProduto">
+            Produto
+        </label>
+
+        <input
+            type="text"
+            id="filtroProduto"
+            placeholder="Pesquisar produto..."
+        >
+
+    </div>
+
+
+    <div class="campo-filtro">
+
+        <label for="filtroTipo">
+            Tipo
+        </label>
+
+        <select id="filtroTipo">
+
+            <option value="todos">
+                Todas
+            </option>
+
+            <option value="entrada">
+                📥 Entradas
+            </option>
+
+            <option value="saida">
+                📤 Saídas
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="campo-filtro">
+
+        <label for="filtroData">
+            Data
+        </label>
+
+        <input
+            type="date"
+            id="filtroData"
+        >
+
+    </div>
+
+
+    <button
+        type="button"
+        id="btnLimparFiltros"
+        class="btn-limpar-filtros"
+    >
+        Limpar filtros
+    </button>
+
+</div>
+
+
+<div class="tabela-container">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Produto</th>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Data e hora</th>
+            </tr>
+
+        </thead>
+
+
+        <tbody id="tabelaMovimentacoes">
+
+            <!-- As movimentações serão carregadas aqui -->
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<div
+    id="semMovimentacoes"
+    class="sem-produtos"
+>
+
+    <div>📋</div>
+
+    <h3>Nenhuma movimentação encontrada</h3>
+
+    <p>
+        As entradas e saídas do estoque aparecerão aqui.
+    </p>
+
+</div>
+```
+
+</section>
+
+<!-- MODAL DE EDIÇÃO -->
+
+<div
+    id="modalEdicao"
+    class="modal"
+>
+
+    <div class="modal-conteudo">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Editar produto</h2>
+
+                <p>
+                    Altere as informações do produto.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="modal-fechar"
+                onclick="fecharEdicao()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form
+            id="formEdicao"
+            onsubmit="salvarEdicao(event)"
+        >
+
+            <input
+                type="hidden"
+                id="editarId"
+            >
+
+
+            <div class="campo">
+
+                <label for="editarNome">
+                    Nome do produto
+                </label>
+
+                <input
+                    type="text"
+                    id="editarNome"
+                    required
+                >
+
+            </div>
+
+<div class="campo">
+
+    <label for="editarCategoria">
+        Categoria
+    </label>
+
+    <select id="editarCategoria" required>
+
+        <option value="">
+            Carregando categorias...
+        </option>
+
+    </select>
+
+</div>
+
+
+            <div class="campo">
+
+                <label for="editarPreco">
+                    Preço
+                </label>
+
+                <input
+                    type="number"
+                    id="editarPreco"
+                    step="0.01"
+                    min="0"
+                    required
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="editarSku">
+                    Código / SKU
+                </label>
+
+                <input
+                    type="text"
+                    id="editarSku"
+                    required
+                >
+
+            </div>
+
+
+            <div class="modal-acoes">
+
+                <button
+                    type="button"
+                    class="btn btn-cancelar"
+                    onclick="fecharEdicao()"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Salvar alterações
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<!-- MODAL DE NOVA CATEGORIA -->
+
+<div
+    id="modalCategoria"
+    class="modal"
+>
+
+    <div class="modal-conteudo">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Nova categoria</h2>
+
+                <p>
+                    Cadastre uma nova categoria para seus produtos.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="modal-fechar"
+                onclick="fecharNovaCategoria()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form
+            id="formCategoria"
+            onsubmit="salvarNovaCategoria(event)"
+        >
+
+            <div class="campo">
+
+                <label for="novaCategoria">
+                    Nome da categoria
+                </label>
+
+                <input
+                    type="text"
+                    id="novaCategoria"
+                    placeholder="Ex: Padaria"
+                    required
+                >
+
+            </div>
+
+
+            <div class="modal-acoes">
+
+                <button
+                    type="button"
+                    class="btn btn-cancelar"
+                    onclick="fecharNovaCategoria()"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Cadastrar categoria
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+    <script
+        src="{{ url_for('static', filename='app.js') }}"
+    ></script>
+
+</body>
+
+</html>
