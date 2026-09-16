@@ -433,28 +433,24 @@ def alterar_quantidade(produto_id):
     # ==============================
 
     conn.execute("""
-        INSERT INTO movimentacoes (
-            produto_id,
-            tipo,
-            quantidade,
-            data_hora
-        )
-        VALUES (?, ?, ?, datetime('now', 'localtime'))
-    """, (
+    INSERT INTO movimentacoes (
         produto_id,
-        tipo_movimentacao,
-        1
-    ))
+        produto_nome,
+        tipo,
+        quantidade,
+        data_hora
+    )
+    VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+""", (
+    produto_id,
+    produto["nome"],
+    tipo_movimentacao,
+    1
+))
 
 
     conn.commit()
     conn.close()
-
-
-    return jsonify({
-        "mensagem": "Quantidade atualizada!",
-        "quantidade": nova_quantidade
-    })
 
 
     return jsonify({
@@ -675,6 +671,10 @@ def excluir_categoria(categoria_id):
 # HISTÓRICO DE MOVIMENTAÇÕES
 # ==============================
 
+# ==============================
+# HISTÓRICO DE MOVIMENTAÇÕES
+# ==============================
+
 @app.route(
     "/api/movimentacoes",
     methods=["GET"]
@@ -685,16 +685,14 @@ def listar_movimentacoes():
 
     movimentacoes = conn.execute("""
         SELECT
-            movimentacoes.id,
-            movimentacoes.produto_id,
-            produtos.nome AS produto_nome,
-            movimentacoes.tipo,
-            movimentacoes.quantidade,
-            movimentacoes.data_hora
+            id,
+            produto_id,
+            produto_nome,
+            tipo,
+            quantidade,
+            data_hora
         FROM movimentacoes
-        INNER JOIN produtos
-            ON produtos.id = movimentacoes.produto_id
-        ORDER BY movimentacoes.id DESC
+        ORDER BY id DESC
     """).fetchall()
 
     conn.close()
@@ -704,9 +702,11 @@ def listar_movimentacoes():
         for movimentacao in movimentacoes
     ])
 
+
 # ==============================
 # INICIAR SERVIDOR
 # ==============================
+
 
 if __name__ == "__main__":
 

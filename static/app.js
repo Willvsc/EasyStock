@@ -184,7 +184,7 @@ function renderizarProdutos() {
 
             </td>
 
-            <td>
+        
 
                 <td>
 
@@ -205,7 +205,7 @@ function renderizarProdutos() {
     </button>
 
 </td>
-            </td>
+            
 
         `;
 
@@ -330,7 +330,9 @@ async function alterarQuantidade(id, operacao) {
         }
 
 
-        await carregarProdutos();
+            await carregarProdutos();
+            await carregarMovimentacoes();
+
 
 
     } catch (erro) {
@@ -1060,85 +1062,164 @@ async function carregarMovimentacoes() {
             document.getElementById("semMovimentacoes");
 
 
+        // ==============================
+        // FILTROS
+        // ==============================
+
+        const termoProduto =
+            filtroProduto.value
+                .toLowerCase()
+                .trim();
+
+        const tipoSelecionado =
+            filtroTipo.value;
+
+        const dataSelecionada =
+            filtroData.value;
+
+
+        // ==============================
+        // APLICAR FILTROS
+        // ==============================
+
+        const movimentacoesFiltradas =
+            movimentacoes.filter(movimentacao => {
+
+                // Filtro por produto
+
+                const correspondeProduto =
+                    movimentacao.produto_nome
+                        .toLowerCase()
+                        .includes(termoProduto);
+
+
+                // Filtro por tipo
+
+                const correspondeTipo =
+                    tipoSelecionado === "todos" ||
+                    movimentacao.tipo === tipoSelecionado;
+
+
+                // Filtro por data
+
+                let correspondeData = true;
+
+
+                if (dataSelecionada) {
+
+                    correspondeData =
+                        movimentacao.data_hora
+                            .startsWith(dataSelecionada);
+
+                }
+
+
+                return (
+                    correspondeProduto &&
+                    correspondeTipo &&
+                    correspondeData
+                );
+
+            });
+
+
+        // ==============================
+        // LIMPAR TABELA
+        // ==============================
+
         tabela.innerHTML = "";
 
 
-        if (movimentacoes.length === 0) {
+        // ==============================
+        // NENHUMA MOVIMENTAÇÃO
+        // ==============================
+
+        if (movimentacoesFiltradas.length === 0) {
 
             semMovimentacoes.style.display = "block";
 
             return;
+
         }
 
 
         semMovimentacoes.style.display = "none";
 
 
-        movimentacoes.forEach((movimentacao) => {
+        // ==============================
+        // RENDERIZAR MOVIMENTAÇÕES
+        // ==============================
 
-            const linha =
-                document.createElement("tr");
+        movimentacoesFiltradas.forEach(
+            movimentacao => {
 
-
-            const entrada =
-                movimentacao.tipo === "entrada";
-
-
-            const tipoTexto =
-                entrada
-                    ? "📥 Entrada"
-                    : "📤 Saída";
+                const linha =
+                    document.createElement("tr");
 
 
-            const tipoClasse =
-                entrada
-                    ? "movimentacao-entrada"
-                    : "movimentacao-saida";
+                const entrada =
+                    movimentacao.tipo === "entrada";
 
 
-            const data =
-                new Date(
-                    movimentacao.data_hora.replace(" ", "T")
-                );
+                const tipoTexto =
+                    entrada
+                        ? "📥 Entrada"
+                        : "📤 Saída";
 
 
-            const dataFormatada =
-                data.toLocaleString(
-                    "pt-BR",
-                    {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    }
-                );
+                const tipoClasse =
+                    entrada
+                        ? "movimentacao-entrada"
+                        : "movimentacao-saida";
 
 
-            linha.innerHTML = `
-                <td>
-                    ${movimentacao.produto_nome}
-                </td>
-
-                <td>
-                    <span class="${tipoClasse}">
-                        ${tipoTexto}
-                    </span>
-                </td>
-
-                <td>
-                    ${movimentacao.quantidade}
-                </td>
-
-                <td>
-                    ${dataFormatada}
-                </td>
-            `;
+                const data =
+                    new Date(
+                        movimentacao.data_hora
+                            .replace(" ", "T")
+                    );
 
 
-            tabela.appendChild(linha);
+                const dataFormatada =
+                    data.toLocaleString(
+                        "pt-BR",
+                        {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        }
+                    );
 
-        });
+
+                linha.innerHTML = `
+                    <td>
+                        ${escaparHTML(
+                            movimentacao.produto_nome
+                        )}
+                    </td>
+
+                    <td>
+                        <span class="${tipoClasse}">
+                            ${tipoTexto}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${movimentacao.quantidade}
+                    </td>
+
+                    <td>
+                        ${dataFormatada}
+                    </td>
+                `;
+
+
+                tabela.appendChild(linha);
+
+            }
+        );
 
 
     } catch (erro) {
@@ -1151,5 +1232,35 @@ async function carregarMovimentacoes() {
     }
 
 }
+filtroProduto.addEventListener(
+    "input",
+    carregarMovimentacoes
+);
+
+
+filtroTipo.addEventListener(
+    "change",
+    carregarMovimentacoes
+);
+
+
+filtroData.addEventListener(
+    "change",
+    carregarMovimentacoes
+);
+
+
+btnLimparFiltros.addEventListener(
+    "click",
+    () => {
+
+        filtroProduto.value = "";
+        filtroTipo.value = "todos";
+        filtroData.value = "";
+
+        carregarMovimentacoes();
+
+    }
+);
 carregarProdutos();
 carregarMovimentacoes();
