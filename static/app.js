@@ -4,6 +4,7 @@ const pesquisa = document.getElementById("pesquisa");
 const contador = document.getElementById("contador");
 const semProdutos = document.getElementById("semProdutos");
 const mensagem = document.getElementById("mensagem");
+
 const filtroProduto =
     document.getElementById("filtroProduto");
 
@@ -15,8 +16,10 @@ const filtroData =
 
 const btnLimparFiltros =
     document.getElementById("btnLimparFiltros");
+
 const btnNovaCategoria =
     document.getElementById("btnNovaCategoria");
+
 btnNovaCategoria.addEventListener(
     "click",
     abrirNovaCategoria
@@ -33,9 +36,11 @@ async function carregarProdutos() {
 
     try {
 
-        const resposta = await fetch("/api/produtos");
+        const resposta =
+            await fetch("/api/produtos");
 
-        produtos = await resposta.json();
+        produtos =
+            await resposta.json();
 
         atualizarDashboard();
 
@@ -43,34 +48,48 @@ async function carregarProdutos() {
 
     } catch (erro) {
 
+        console.error(
+            "Erro ao carregar produtos:",
+            erro
+        );
+
         mostrarMensagem(
             "Não foi possível carregar os produtos.",
             "erro"
         );
 
     }
+
 }
 
 
 // ==============================
-// RENDERIZAR TABELA
+// RENDERIZAR TABELA DE PRODUTOS
 // ==============================
 
 function renderizarProdutos() {
 
-    const termo = pesquisa.value
-        .toLowerCase()
-        .trim();
+    const termo =
+        pesquisa.value
+            .toLowerCase()
+            .trim();
 
+    semProdutos.style.display = "none";
 
-    const produtosFiltrados = produtos.filter(produto => {
+    const produtosFiltrados =
+        produtos.filter(produto => {
 
-        return (
-            produto.nome.toLowerCase().includes(termo) ||
-            produto.sku.toLowerCase().includes(termo)
-        );
+            return (
+                produto.nome
+                    .toLowerCase()
+                    .includes(termo) ||
 
-    });
+                produto.sku
+                    .toLowerCase()
+                    .includes(termo)
+            );
+
+        });
 
 
     tabela.innerHTML = "";
@@ -94,10 +113,13 @@ function renderizarProdutos() {
 
     produtosFiltrados.forEach(produto => {
 
-        const linha = document.createElement("tr");
+        const linha =
+            document.createElement("tr");
 
 
-        // Define status
+        // ==============================
+        // STATUS DO ESTOQUE
+        // ==============================
 
         let statusTexto;
         let statusClasse;
@@ -125,13 +147,16 @@ function renderizarProdutos() {
         }
 
 
-        linha.className = linhaClasse;
+        linha.className =
+            linhaClasse;
 
 
         linha.innerHTML = `
 
             <td>
-                <strong>${escaparHTML(produto.nome)}</strong>
+                <strong>
+                    ${escaparHTML(produto.nome)}
+                </strong>
             </td>
 
             <td>
@@ -184,28 +209,25 @@ function renderizarProdutos() {
 
             </td>
 
-        
+            <td>
 
-                <td>
+                <button
+                    class="btn-editar"
+                    onclick="abrirEdicao(${produto.id})"
+                    title="Editar produto"
+                >
+                    ✏️
+                </button>
 
-    <button
-        class="btn-editar"
-        onclick="abrirEdicao(${produto.id})"
-        title="Editar produto"
-    >
-        ✏️
-    </button>
+                <button
+                    class="btn-excluir"
+                    onclick="excluirProduto(${produto.id})"
+                    title="Excluir produto"
+                >
+                    🗑️
+                </button>
 
-    <button
-        class="btn-excluir"
-        onclick="excluirProduto(${produto.id})"
-        title="Excluir produto"
-    >
-        🗑️
-    </button>
-
-</td>
-            
+            </td>
 
         `;
 
@@ -221,118 +243,138 @@ function renderizarProdutos() {
 // CADASTRAR PRODUTO
 // ==============================
 
-formulario.addEventListener("submit", async (evento) => {
+formulario.addEventListener(
+    "submit",
+    async (evento) => {
 
-    evento.preventDefault();
-
-
-    const dados = {
-
-        nome: document.getElementById("nome").value,
-
-        categoria:
-            document.getElementById("categoria").value,
-
-        preco:
-            document.getElementById("preco").value,
-
-        quantidade:
-            document.getElementById("quantidade").value,
-
-        sku:
-            document.getElementById("sku").value
-
-    };
+        evento.preventDefault();
 
 
-    try {
+        const dados = {
 
-        const resposta = await fetch("/api/produtos", {
+            nome:
+                document.getElementById("nome").value,
 
-            method: "POST",
+            categoria:
+                document.getElementById("categoria").value,
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+            preco:
+                document.getElementById("preco").value,
 
-            body: JSON.stringify(dados)
+            quantidade:
+                document.getElementById("quantidade").value,
 
-        });
+            sku:
+                document.getElementById("sku").value
+
+        };
 
 
-        const resultado = await resposta.json();
+        try {
+
+            const resposta =
+                await fetch(
+                    "/api/produtos",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(dados)
+                    }
+                );
 
 
-        if (!resposta.ok) {
+            const resultado =
+                await resposta.json();
 
-            throw new Error(resultado.erro);
+
+            if (!resposta.ok) {
+
+                throw new Error(
+                    resultado.erro
+                );
+
+            }
+
+
+            mostrarMensagem(
+                resultado.mensagem,
+                "sucesso"
+            );
+
+
+            formulario.reset();
+
+
+            await carregarProdutos();
+
+
+        } catch (erro) {
+
+            mostrarMensagem(
+                erro.message,
+                "erro"
+            );
 
         }
 
-
-        mostrarMensagem(
-            resultado.mensagem,
-            "sucesso"
-        );
-
-
-        formulario.reset();
-
-
-        await carregarProdutos();
-
-
-    } catch (erro) {
-
-        mostrarMensagem(
-            erro.message,
-            "erro"
-        );
-
     }
-
-});
+);
 
 
 // ==============================
 // ALTERAR QUANTIDADE
 // ==============================
 
-async function alterarQuantidade(id, operacao) {
+async function alterarQuantidade(
+    id,
+    operacao
+) {
 
     try {
 
-        const resposta = await fetch(
-            `/api/produtos/${id}/quantidade`,
-            {
+        const resposta =
+            await fetch(
+                `/api/produtos/${id}/quantidade`,
+                {
 
-                method: "PATCH",
+                    method: "PATCH",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify({
-                    operacao: operacao
-                })
+                    body:
+                        JSON.stringify({
+                            operacao: operacao
+                        })
 
-            }
-        );
+                }
+            );
 
 
-        const resultado = await resposta.json();
+        const resultado =
+            await resposta.json();
 
 
         if (!resposta.ok) {
 
-            throw new Error(resultado.erro);
+            throw new Error(
+                resultado.erro
+            );
 
         }
 
 
-            await carregarProdutos();
-            await carregarMovimentacoes();
+        await carregarProdutos();
 
+        await carregarMovimentacoes();
 
 
     } catch (erro) {
@@ -353,9 +395,10 @@ async function alterarQuantidade(id, operacao) {
 
 async function excluirProduto(id) {
 
-    const confirmar = confirm(
-        "Tem certeza que deseja excluir este produto?"
-    );
+    const confirmar =
+        confirm(
+            "Tem certeza que deseja excluir este produto?"
+        );
 
 
     if (!confirmar) {
@@ -365,20 +408,24 @@ async function excluirProduto(id) {
 
     try {
 
-        const resposta = await fetch(
-            `/api/produtos/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
+        const resposta =
+            await fetch(
+                `/api/produtos/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
 
 
-        const resultado = await resposta.json();
+        const resultado =
+            await resposta.json();
 
 
         if (!resposta.ok) {
 
-            throw new Error(resultado.erro);
+            throw new Error(
+                resultado.erro
+            );
 
         }
 
@@ -390,6 +437,7 @@ async function excluirProduto(id) {
 
 
         await carregarProdutos();
+
         await carregarMovimentacoes();
 
 
@@ -406,7 +454,7 @@ async function excluirProduto(id) {
 
 
 // ==============================
-// PESQUISA
+// PESQUISA DE PRODUTOS
 // ==============================
 
 pesquisa.addEventListener(
@@ -419,9 +467,13 @@ pesquisa.addEventListener(
 // MENSAGENS
 // ==============================
 
-function mostrarMensagem(texto, tipo) {
+function mostrarMensagem(
+    texto,
+    tipo
+) {
 
-    mensagem.textContent = texto;
+    mensagem.textContent =
+        texto;
 
     mensagem.className =
         `mensagem ${tipo}`;
@@ -429,7 +481,8 @@ function mostrarMensagem(texto, tipo) {
 
     setTimeout(() => {
 
-        mensagem.className = "mensagem";
+        mensagem.className =
+            "mensagem";
 
     }, 3000);
 
@@ -442,9 +495,11 @@ function mostrarMensagem(texto, tipo) {
 
 function escaparHTML(texto) {
 
-    const elemento = document.createElement("div");
+    const elemento =
+        document.createElement("div");
 
-    elemento.textContent = texto;
+    elemento.textContent =
+        texto;
 
     return elemento.innerHTML;
 
@@ -452,19 +507,15 @@ function escaparHTML(texto) {
 
 
 // ==============================
-// INICIALIZAÇÃO
-// ==============================
-
-carregarProdutos();
-// ==============================
 // ABRIR EDIÇÃO
 // ==============================
 
 function abrirEdicao(id) {
 
-    const produto = produtos.find(
-        produto => produto.id === id
-    );
+    const produto =
+        produtos.find(
+            produto => produto.id === id
+        );
 
 
     if (!produto) {
@@ -472,45 +523,77 @@ function abrirEdicao(id) {
     }
 
 
-    document.getElementById("editarId").value =
+    document.getElementById(
+        "editarId"
+    ).value =
         produto.id;
 
-    document.getElementById("editarNome").value =
+
+    document.getElementById(
+        "editarNome"
+    ).value =
         produto.nome;
-const selectCategoria =
-    document.getElementById("editarCategoria");
-
-const categoriaExiste =
-    Array.from(selectCategoria.options)
-        .some(option => option.value === produto.categoria);
 
 
-if (!categoriaExiste && produto.categoria) {
-
-    const novaOpcao =
-        document.createElement("option");
-
-    novaOpcao.value = produto.categoria;
-
-    novaOpcao.textContent =
-        `${produto.categoria} (atual)`;
-
-    selectCategoria.appendChild(novaOpcao);
-}
+    const selectCategoria =
+        document.getElementById(
+            "editarCategoria"
+        );
 
 
-selectCategoria.value =
-    produto.categoria;
+    const categoriaExiste =
+        Array.from(
+            selectCategoria.options
+        ).some(
+            option =>
+                option.value ===
+                produto.categoria
+        );
 
-    document.getElementById("editarPreco").value =
+
+    if (
+        !categoriaExiste &&
+        produto.categoria
+    ) {
+
+        const novaOpcao =
+            document.createElement(
+                "option"
+            );
+
+        novaOpcao.value =
+            produto.categoria;
+
+        novaOpcao.textContent =
+            `${produto.categoria} (atual)`;
+
+        selectCategoria.appendChild(
+            novaOpcao
+        );
+
+    }
+
+
+    selectCategoria.value =
+        produto.categoria;
+
+
+    document.getElementById(
+        "editarPreco"
+    ).value =
         produto.preco;
 
-    document.getElementById("editarSku").value =
+
+    document.getElementById(
+        "editarSku"
+    ).value =
         produto.sku;
 
 
-    document.getElementById("modalEdicao")
-        .classList.add("ativo");
+    document.getElementById(
+        "modalEdicao"
+    ).classList.add("ativo");
+
 }
 
 
@@ -520,8 +603,10 @@ selectCategoria.value =
 
 function fecharEdicao() {
 
-    document.getElementById("modalEdicao")
-        .classList.remove("ativo");
+    document.getElementById(
+        "modalEdicao"
+    ).classList.remove("ativo");
+
 }
 
 
@@ -535,45 +620,59 @@ async function salvarEdicao(evento) {
 
 
     const id =
-        document.getElementById("editarId").value;
+        document.getElementById(
+            "editarId"
+        ).value;
 
 
     const dados = {
 
         nome:
-            document.getElementById("editarNome").value,
+            document.getElementById(
+                "editarNome"
+            ).value,
 
         categoria:
-            document.getElementById("editarCategoria").value,
+            document.getElementById(
+                "editarCategoria"
+            ).value,
 
         preco:
-            document.getElementById("editarPreco").value,
+            document.getElementById(
+                "editarPreco"
+            ).value,
 
         sku:
-            document.getElementById("editarSku").value
+            document.getElementById(
+                "editarSku"
+            ).value
 
     };
 
 
     try {
 
-        const resposta = await fetch(
-            `/api/produtos/${id}`,
-            {
+        const resposta =
+            await fetch(
+                `/api/produtos/${id}`,
+                {
 
-                method: "PUT",
+                    method: "PUT",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify(dados)
+                    body:
+                        JSON.stringify(dados)
 
-            }
-        );
+                }
+            );
 
 
-        const resultado = await resposta.json();
+        const resultado =
+            await resposta.json();
 
 
         if (!resposta.ok) {
@@ -607,9 +706,7 @@ async function salvarEdicao(evento) {
     }
 
 }
-// ==============================
-// CATEGORIAS
-// ==============================
+
 
 // ==============================
 // CATEGORIAS
@@ -619,110 +716,161 @@ async function carregarCategorias() {
 
     try {
 
-        const resposta = await fetch("/api/categorias");
+        const resposta =
+            await fetch(
+                "/api/categorias"
+            );
 
-        const categorias = await resposta.json();
 
-        const lista = document.getElementById("listaCategorias");
+        const categorias =
+            await resposta.json();
+
+
+        const lista =
+            document.getElementById(
+                "listaCategorias"
+            );
+
 
         const selectCategoria =
-            document.getElementById("categoria");
+            document.getElementById(
+                "categoria"
+            );
+
 
         const selectEditarCategoria =
-            document.getElementById("editarCategoria");
+            document.getElementById(
+                "editarCategoria"
+            );
 
 
         // ==============================
-        // ATUALIZAR LISTA DE CATEGORIAS
+        // LISTA DE CATEGORIAS
         // ==============================
 
         lista.innerHTML = "";
 
-        categorias.forEach(categoria => {
 
-            const item = document.createElement("div");
+        categorias.forEach(
+            categoria => {
 
-            item.className = "categoria-item";
+                const item =
+                    document.createElement(
+                        "div"
+                    );
 
-            item.innerHTML = `
-                <span>
-                    ${escaparHTML(categoria.nome)}
-                </span>
 
-                <div class="categoria-acoes">
+                item.className =
+                    "categoria-item";
 
-                    <button
-                        type="button"
-                        class="btn-editar"
-                        onclick="abrirEdicaoCategoria(${categoria.id})"
-                        title="Editar categoria"
-                    >
-                        ✏️
-                    </button>
 
-                    <button
-                        type="button"
-                        class="btn-excluir"
-                        onclick="excluirCategoria(${categoria.id})"
-                        title="Excluir categoria"
-                    >
-                        🗑️
-                    </button>
+                item.innerHTML = `
 
-                </div>
-            `;
+                    <span>
+                        ${escaparHTML(
+                            categoria.nome
+                        )}
+                    </span>
 
-            lista.appendChild(item);
+                    <div class="categoria-acoes">
 
-        });
+                        <button
+                            type="button"
+                            class="btn-editar"
+                            onclick="abrirEdicaoCategoria(${categoria.id})"
+                            title="Editar categoria"
+                        >
+                            ✏️
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn-excluir"
+                            onclick="excluirCategoria(${categoria.id})"
+                            title="Excluir categoria"
+                        >
+                            🗑️
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                lista.appendChild(item);
+
+            }
+        );
 
 
         // ==============================
-        // ATUALIZAR SELECT DO CADASTRO
+        // SELECT DO CADASTRO
         // ==============================
 
         selectCategoria.innerHTML = `
+
             <option value="">
                 Selecione uma categoria
             </option>
+
         `;
 
 
         // ==============================
-        // ATUALIZAR SELECT DA EDIÇÃO
+        // SELECT DA EDIÇÃO
         // ==============================
 
         selectEditarCategoria.innerHTML = `
+
             <option value="">
                 Selecione uma categoria
             </option>
+
         `;
 
 
-        categorias.forEach(categoria => {
+        categorias.forEach(
+            categoria => {
 
-            const opcaoCadastro =
-                document.createElement("option");
-
-            opcaoCadastro.value = categoria.nome;
-            opcaoCadastro.textContent = categoria.nome;
-
-            selectCategoria.appendChild(
-                opcaoCadastro
-            );
+                const opcaoCadastro =
+                    document.createElement(
+                        "option"
+                    );
 
 
-            const opcaoEdicao =
-                document.createElement("option");
+                opcaoCadastro.value =
+                    categoria.nome;
 
-            opcaoEdicao.value = categoria.nome;
-            opcaoEdicao.textContent = categoria.nome;
 
-            selectEditarCategoria.appendChild(
-                opcaoEdicao
-            );
+                opcaoCadastro.textContent =
+                    categoria.nome;
 
-        });
+
+                selectCategoria.appendChild(
+                    opcaoCadastro
+                );
+
+
+                const opcaoEdicao =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                opcaoEdicao.value =
+                    categoria.nome;
+
+
+                opcaoEdicao.textContent =
+                    categoria.nome;
+
+
+                selectEditarCategoria.appendChild(
+                    opcaoEdicao
+                );
+
+            }
+        );
 
 
     } catch (erro) {
@@ -735,7 +883,11 @@ async function carregarCategorias() {
     }
 
 }
+
+
 carregarCategorias();
+
+
 // ==============================
 // NOVA CATEGORIA
 // ==============================
@@ -743,70 +895,107 @@ carregarCategorias();
 function abrirNovaCategoria() {
 
     document
-        .getElementById("modalCategoria")
+        .getElementById(
+            "modalCategoria"
+        )
         .classList.add("ativo");
 
+
     document
-        .getElementById("novaCategoria")
+        .getElementById(
+            "novaCategoria"
+        )
         .focus();
+
 }
 
 
 function fecharNovaCategoria() {
 
     document
-        .getElementById("modalCategoria")
+        .getElementById(
+            "modalCategoria"
+        )
         .classList.remove("ativo");
 
+
     document
-        .getElementById("formCategoria")
+        .getElementById(
+            "formCategoria"
+        )
         .reset();
+
 }
 
 
-async function salvarNovaCategoria(evento) {
+async function salvarNovaCategoria(
+    evento
+) {
 
     evento.preventDefault();
 
-    const nome = document
-        .getElementById("novaCategoria")
-        .value
-        .trim();
+
+    const nome =
+        document
+            .getElementById(
+                "novaCategoria"
+            )
+            .value
+            .trim();
+
 
     if (!nome) {
         return;
     }
 
+
     try {
 
-        const resposta = await fetch("/api/categorias", {
+        const resposta =
+            await fetch(
+                "/api/categorias",
+                {
 
-            method: "POST",
+                    method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-            body: JSON.stringify({
-                nome: nome
-            })
+                    body:
+                        JSON.stringify({
+                            nome: nome
+                        })
 
-        });
+                }
+            );
 
-        const resultado = await resposta.json();
+
+        const resultado =
+            await resposta.json();
+
 
         if (!resposta.ok) {
-            throw new Error(resultado.erro);
+
+            throw new Error(
+                resultado.erro
+            );
+
         }
 
+
         fecharNovaCategoria();
+
 
         mostrarMensagem(
             resultado.mensagem,
             "sucesso"
         );
 
+
         await carregarCategorias();
+
 
     } catch (erro) {
 
@@ -818,6 +1007,8 @@ async function salvarNovaCategoria(evento) {
     }
 
 }
+
+
 // ==============================
 // EDITAR CATEGORIA
 // ==============================
@@ -826,28 +1017,43 @@ async function abrirEdicaoCategoria(id) {
 
     try {
 
-        const resposta = await fetch("/api/categorias");
+        const resposta =
+            await fetch(
+                "/api/categorias"
+            );
 
-        const categorias = await resposta.json();
 
-        const categoria = categorias.find(
-            categoria => categoria.id === id
-        );
+        const categorias =
+            await resposta.json();
+
+
+        const categoria =
+            categorias.find(
+                categoria =>
+                    categoria.id === id
+            );
+
 
         if (!categoria) {
             return;
         }
 
-        const novoNome = prompt(
-            "Digite o novo nome da categoria:",
-            categoria.nome
-        );
+
+        const novoNome =
+            prompt(
+                "Digite o novo nome da categoria:",
+                categoria.nome
+            );
+
 
         if (novoNome === null) {
             return;
         }
 
-        const nome = novoNome.trim();
+
+        const nome =
+            novoNome.trim();
+
 
         if (!nome) {
 
@@ -857,36 +1063,54 @@ async function abrirEdicaoCategoria(id) {
             );
 
             return;
+
         }
 
-        const respostaEdicao = await fetch(
-            `/api/categorias/${id}`,
-            {
-                method: "PUT",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+        const respostaEdicao =
+            await fetch(
+                `/api/categorias/${id}`,
+                {
 
-                body: JSON.stringify({
-                    nome: nome
-                })
-            }
-        );
+                    method: "PUT",
 
-        const resultado = await respostaEdicao.json();
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            nome: nome
+                        })
+
+                }
+            );
+
+
+        const resultado =
+            await respostaEdicao.json();
+
 
         if (!respostaEdicao.ok) {
-            throw new Error(resultado.erro);
+
+            throw new Error(
+                resultado.erro
+            );
+
         }
+
 
         mostrarMensagem(
             resultado.mensagem,
             "sucesso"
         );
 
+
         await carregarCategorias();
+
         await carregarProdutos();
+
 
     } catch (erro) {
 
@@ -898,49 +1122,79 @@ async function abrirEdicaoCategoria(id) {
     }
 
 }
+
+
+// ==============================
+// EXCLUIR CATEGORIA
+// ==============================
+
 async function excluirCategoria(id) {
 
     try {
 
-        const respostaCategorias = await fetch("/api/categorias");
+        const respostaCategorias =
+            await fetch(
+                "/api/categorias"
+            );
 
-        const categorias = await respostaCategorias.json();
 
-        const categoria = categorias.find(
-            categoria => categoria.id === id
-        );
+        const categorias =
+            await respostaCategorias.json();
+
+
+        const categoria =
+            categorias.find(
+                categoria =>
+                    categoria.id === id
+            );
+
 
         if (!categoria) {
             return;
         }
 
-        const confirmar = confirm(
-            `Tem certeza que deseja excluir a categoria "${categoria.nome}"?`
-        );
+
+        const confirmar =
+            confirm(
+                `Tem certeza que deseja excluir a categoria "${categoria.nome}"?`
+            );
+
 
         if (!confirmar) {
             return;
         }
 
-        const resposta = await fetch(
-            `/api/categorias/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
 
-        const resultado = await resposta.json();
+        const resposta =
+            await fetch(
+                `/api/categorias/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        const resultado =
+            await resposta.json();
+
 
         if (!resposta.ok) {
-            throw new Error(resultado.erro);
+
+            throw new Error(
+                resultado.erro
+            );
+
         }
+
 
         mostrarMensagem(
             resultado.mensagem,
             "sucesso"
         );
 
+
         await carregarCategorias();
+
 
     } catch (erro) {
 
@@ -952,9 +1206,7 @@ async function excluirCategoria(id) {
     }
 
 }
-// ==============================
-// DASHBOARD
-// ==============================
+
 
 // ==============================
 // DASHBOARD
@@ -963,64 +1215,94 @@ async function excluirCategoria(id) {
 function atualizarDashboard() {
 
     const totalProdutos =
-        document.getElementById("totalProdutos");
+        document.getElementById(
+            "totalProdutos"
+        );
+
 
     const totalItens =
-        document.getElementById("totalItens");
+        document.getElementById(
+            "totalItens"
+        );
+
 
     const estoqueBaixo =
-        document.getElementById("estoqueBaixo");
+        document.getElementById(
+            "estoqueBaixo"
+        );
+
 
     const semEstoque =
-        document.getElementById("semEstoque");
+        document.getElementById(
+            "semEstoque"
+        );
+
 
     const valorEstoque =
-        document.getElementById("valorEstoque");
+        document.getElementById(
+            "valorEstoque"
+        );
 
 
     let quantidadeTotal = 0;
+
     let quantidadeEstoqueBaixo = 0;
+
     let quantidadeSemEstoque = 0;
+
     let valorTotalEstoque = 0;
 
 
-    produtos.forEach((produto) => {
+    produtos.forEach(
+        produto => {
 
-        const quantidade =
-            Number(produto.quantidade);
-
-        const preco =
-            Number(produto.preco);
-
-
-        quantidadeTotal += quantidade;
+            const quantidade =
+                Number(
+                    produto.quantidade
+                );
 
 
-        valorTotalEstoque +=
-            preco * quantidade;
+            const preco =
+                Number(
+                    produto.preco
+                );
 
 
-        if (quantidade === 0) {
+            quantidadeTotal +=
+                quantidade;
 
-            quantidadeSemEstoque++;
 
-        } else if (quantidade < 5) {
+            valorTotalEstoque +=
+                preco * quantidade;
 
-            quantidadeEstoqueBaixo++;
+
+            if (quantidade === 0) {
+
+                quantidadeSemEstoque++;
+
+            } else if (
+                quantidade < 5
+            ) {
+
+                quantidadeEstoqueBaixo++;
+
+            }
 
         }
-
-    });
+    );
 
 
     totalProdutos.textContent =
         produtos.length;
 
+
     totalItens.textContent =
         quantidadeTotal;
 
+
     estoqueBaixo.textContent =
         quantidadeEstoqueBaixo;
+
 
     semEstoque.textContent =
         quantidadeSemEstoque;
@@ -1036,9 +1318,7 @@ function atualizarDashboard() {
         );
 
 }
-// ==============================
-// HISTÓRICO DE MOVIMENTAÇÕES
-// ==============================
+
 
 // ==============================
 // HISTÓRICO DE MOVIMENTAÇÕES
@@ -1049,17 +1329,90 @@ async function carregarMovimentacoes() {
     try {
 
         const resposta =
-            await fetch("/api/movimentacoes");
+            await fetch(
+                "/api/movimentacoes"
+            );
+
 
         const movimentacoes =
             await resposta.json();
 
 
+        // ==============================
+        // CONTADORES DE ENTRADAS E SAÍDAS
+        // ==============================
+
+        const totalEntradas =
+            document.getElementById(
+                "totalEntradas"
+            );
+
+
+        const totalSaidas =
+            document.getElementById(
+                "totalSaidas"
+            );
+
+
+        let quantidadeEntradas = 0;
+
+        let quantidadeSaidas = 0;
+
+
+        movimentacoes.forEach(
+            movimentacao => {
+
+                if (
+                    movimentacao.tipo ===
+                    "entrada"
+                ) {
+
+                    quantidadeEntradas +=
+                        Number(
+                            movimentacao.quantidade
+                        );
+
+                }
+
+
+                if (
+                    movimentacao.tipo ===
+                    "saida"
+                ) {
+
+                    quantidadeSaidas +=
+                        Number(
+                            movimentacao.quantidade
+                        );
+
+                }
+
+            }
+        );
+
+
+        totalEntradas.textContent =
+            quantidadeEntradas;
+
+
+        totalSaidas.textContent =
+            quantidadeSaidas;
+
+
+        // ==============================
+        // ELEMENTOS DO HISTÓRICO
+        // ==============================
+
         const tabela =
-            document.getElementById("tabelaMovimentacoes");
+            document.getElementById(
+                "tabelaMovimentacoes"
+            );
+
 
         const semMovimentacoes =
-            document.getElementById("semMovimentacoes");
+            document.getElementById(
+                "semMovimentacoes"
+            );
 
 
         // ==============================
@@ -1071,8 +1424,10 @@ async function carregarMovimentacoes() {
                 .toLowerCase()
                 .trim();
 
+
         const tipoSelecionado =
             filtroTipo.value;
+
 
         const dataSelecionada =
             filtroData.value;
@@ -1083,44 +1438,49 @@ async function carregarMovimentacoes() {
         // ==============================
 
         const movimentacoesFiltradas =
-            movimentacoes.filter(movimentacao => {
+            movimentacoes.filter(
+                movimentacao => {
 
-                // Filtro por produto
-
-                const correspondeProduto =
-                    movimentacao.produto_nome
-                        .toLowerCase()
-                        .includes(termoProduto);
-
-
-                // Filtro por tipo
-
-                const correspondeTipo =
-                    tipoSelecionado === "todos" ||
-                    movimentacao.tipo === tipoSelecionado;
+                    const correspondeProduto =
+                        movimentacao.produto_nome
+                            .toLowerCase()
+                            .includes(
+                                termoProduto
+                            );
 
 
-                // Filtro por data
+                    const correspondeTipo =
+                        tipoSelecionado ===
+                            "todos" ||
+                        movimentacao.tipo ===
+                            tipoSelecionado;
 
-                let correspondeData = true;
+
+                    let correspondeData =
+                        true;
 
 
-                if (dataSelecionada) {
+                    if (
+                        dataSelecionada
+                    ) {
 
-                    correspondeData =
-                        movimentacao.data_hora
-                            .startsWith(dataSelecionada);
+                        correspondeData =
+                            movimentacao.data_hora
+                                .startsWith(
+                                    dataSelecionada
+                                );
+
+                    }
+
+
+                    return (
+                        correspondeProduto &&
+                        correspondeTipo &&
+                        correspondeData
+                    );
 
                 }
-
-
-                return (
-                    correspondeProduto &&
-                    correspondeTipo &&
-                    correspondeData
-                );
-
-            });
+            );
 
 
         // ==============================
@@ -1134,16 +1494,21 @@ async function carregarMovimentacoes() {
         // NENHUMA MOVIMENTAÇÃO
         // ==============================
 
-        if (movimentacoesFiltradas.length === 0) {
+        if (
+            movimentacoesFiltradas.length ===
+            0
+        ) {
 
-            semMovimentacoes.style.display = "block";
+            semMovimentacoes.style.display =
+                "block";
 
             return;
 
         }
 
 
-        semMovimentacoes.style.display = "none";
+        semMovimentacoes.style.display =
+            "none";
 
 
         // ==============================
@@ -1154,11 +1519,14 @@ async function carregarMovimentacoes() {
             movimentacao => {
 
                 const linha =
-                    document.createElement("tr");
+                    document.createElement(
+                        "tr"
+                    );
 
 
                 const entrada =
-                    movimentacao.tipo === "entrada";
+                    movimentacao.tipo ===
+                    "entrada";
 
 
                 const tipoTexto =
@@ -1176,7 +1544,10 @@ async function carregarMovimentacoes() {
                 const data =
                     new Date(
                         movimentacao.data_hora
-                            .replace(" ", "T")
+                            .replace(
+                                " ",
+                                "T"
+                            )
                     );
 
 
@@ -1194,6 +1565,7 @@ async function carregarMovimentacoes() {
 
 
                 linha.innerHTML = `
+
                     <td>
                         ${escaparHTML(
                             movimentacao.produto_nome
@@ -1213,10 +1585,13 @@ async function carregarMovimentacoes() {
                     <td>
                         ${dataFormatada}
                     </td>
+
                 `;
 
 
-                tabela.appendChild(linha);
+                tabela.appendChild(
+                    linha
+                );
 
             }
         );
@@ -1232,6 +1607,12 @@ async function carregarMovimentacoes() {
     }
 
 }
+
+
+// ==============================
+// FILTROS DO HISTÓRICO
+// ==============================
+
 filtroProduto.addEventListener(
     "input",
     carregarMovimentacoes
@@ -1255,12 +1636,28 @@ btnLimparFiltros.addEventListener(
     () => {
 
         filtroProduto.value = "";
+
         filtroTipo.value = "todos";
+
         filtroData.value = "";
 
         carregarMovimentacoes();
 
     }
 );
-carregarProdutos();
-carregarMovimentacoes();
+
+
+// ==============================
+// INICIALIZAÇÃO
+// ==============================
+
+window.addEventListener(
+    "load",
+    () => {
+
+        carregarProdutos();
+
+        carregarMovimentacoes();
+
+    }
+);
