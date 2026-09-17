@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, render_template
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
 app = Flask(__name__)
@@ -13,6 +14,7 @@ DATABASE = "estoque.db"
 def conectar_banco():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 
@@ -21,20 +23,35 @@ def conectar_banco():
 # ==============================
 
 def inicializar_banco():
+
     conn = conectar_banco()
 
+
     # ==============================
-    # TABELA DE PRODUTOS
+    # TABELA DE PERFIS
     # ==============================
 
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS produtos (
+        CREATE TABLE IF NOT EXISTS perfil (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL UNIQUE,
+            descricao TEXT
+        )
+    """)
+
+
+    # ==============================
+    # TABELA DE USUÁRIOS
+    # ==============================
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS usuario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
-            categoria TEXT NOT NULL,
-            preco REAL NOT NULL,
-            quantidade INTEGER NOT NULL DEFAULT 0,
-            sku TEXT NOT NULL UNIQUE
+            email TEXT NOT NULL UNIQUE,
+            senha TEXT NOT NULL,
+            perfil_id INTEGER NOT NULL,
+            FOREIGN KEY (perfil_id) REFERENCES perfil(id)
         )
     """)
 
@@ -52,19 +69,67 @@ def inicializar_banco():
 
 
     # ==============================
+    # TABELA DE PRODUTOS
+    # ==============================
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS produtos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            preco REAL NOT NULL,
+            quantidade INTEGER NOT NULL DEFAULT 0,
+            sku TEXT NOT NULL UNIQUE,
+            categoria_id INTEGER NOT NULL,
+            FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+        )
+    """)
+
+
+    # ==============================
     # TABELA DE MOVIMENTAÇÕES
     # ==============================
 
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS movimentacoes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            produto_id INTEGER NOT NULL,
-            tipo TEXT NOT NULL,
-            quantidade INTEGER NOT NULL,
-            data_hora TEXT NOT NULL,
-            FOREIGN KEY (produto_id) REFERENCES produtos(id)
+    CREATE TABLE IF NOT EXISTS movimentacoes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        produto_id INTEGER,
+        produto_nome TEXT,
+        tipo TEXT NOT NULL,
+        quantidade INTEGER NOT NULL,
+        data_hora TEXT NOT NULL,
+        FOREIGN KEY (produto_id)
+            REFERENCES produtos(id)
+            ON DELETE SET NULL
+    )
+""")
+
+    # ==============================
+    # PERFIS PADRÃO
+    # ==============================
+
+    perfis_padrao = [
+        (
+            "Administrador",
+            "Acesso completo ao sistema"
+        ),
+        (
+            "Funcionário",
+            "Acesso às operações de estoque"
         )
-    """)
+    ]
+
+    for nome, descricao in perfis_padrao:
+
+        conn.execute("""
+            INSERT OR IGNORE INTO perfil (
+                nome,
+                descricao
+            )
+            VALUES (?, ?)
+        """, (
+            nome,
+            descricao
+        ))
 
 
     # ==============================
@@ -82,7 +147,6 @@ def inicializar_banco():
         "Outros"
     ]
 
-
     for categoria in categorias_padrao:
 
         conn.execute("""
@@ -93,7 +157,6 @@ def inicializar_banco():
 
     conn.commit()
     conn.close()
-
 
 # ==============================
 # PÁGINA PRINCIPAL
@@ -114,9 +177,18 @@ def listar_produtos():
     conn = conectar_banco()
 
     produtos = conn.execute("""
-        SELECT *
+        SELECT
+            produtos.id,
+            produtos.nome,
+            produtos.preco,
+            produtos.quantidade,
+            produtos.sku,
+            produtos.categoria_id,
+            categorias.nome AS categoria
         FROM produtos
-        ORDER BY nome ASC
+        LEFT JOIN categorias
+            ON produtos.categoria_id = categorias.id
+        ORDER BY produtos.nome ASC
     """).fetchall()
 
     conn.close()
@@ -125,7 +197,6 @@ def listar_produtos():
         dict(produto)
         for produto in produtos
     ])
-
 
 # ==============================
 # LISTAR CATEGORIAS
@@ -199,13 +270,35 @@ def adicionar_produto():
 
     conn = conectar_banco()
 
+
+    # Localizar a categoria selecionada
+
+    categoria_banco = conn.execute("""
+        SELECT id
+        FROM categorias
+        WHERE nome = ?
+    """, (categoria,)).fetchone()
+
+
+    if not categoria_banco:
+
+        conn.close()
+
+        return jsonify({
+            "erro": "Categoria não encontrada."
+        }), 400
+
+
+    categoria_id = categoria_banco["id"]
+
+
     try:
 
         conn.execute("""
             INSERT INTO produtos
             (
                 nome,
-                categoria,
+                categoria_id,
                 preco,
                 quantidade,
                 sku
@@ -213,7 +306,7 @@ def adicionar_produto():
             VALUES (?, ?, ?, ?, ?)
         """, (
             nome,
-            categoria,
+            categoria_id,
             preco,
             quantidade,
             sku
@@ -235,7 +328,6 @@ def adicionar_produto():
     return jsonify({
         "mensagem": "Produto cadastrado com sucesso!"
     }), 201
-
 
 # ==============================
 # EDITAR PRODUTO
@@ -285,7 +377,25 @@ def editar_produto(produto_id):
 
     conn = conectar_banco()
 
+    # Localizar a categoria selecionada
 
+    categoria_banco = conn.execute("""
+        SELECT id
+        FROM categorias
+        WHERE nome = ?
+    """, (categoria,)).fetchone()
+
+
+    if not categoria_banco:
+
+        conn.close()
+
+        return jsonify({
+            "erro": "Categoria não encontrada."
+        }), 400
+
+
+    categoria_id = categoria_banco["id"]
     # Verificar se o produto existe
 
     produto = conn.execute("""
@@ -327,19 +437,19 @@ def editar_produto(produto_id):
         }), 400
 
 
-    # Atualizar produto
+    # Atualizar produto 
 
     conn.execute("""
         UPDATE produtos
         SET
             nome = ?,
-            categoria = ?,
+            categoria_id = ?,
             preco = ?,
             sku = ?
         WHERE id = ?
     """, (
         nome,
-        categoria,
+        categoria_id,
         preco,
         sku,
         produto_id
@@ -606,12 +716,6 @@ def editar_categoria(categoria_id):
         WHERE id = ?
     """, (nome, categoria_id))
 
-    conn.execute("""
-        UPDATE produtos
-        SET categoria = ?
-        WHERE categoria = ?
-    """, (nome, categoria["nome"]))
-
     conn.commit()
     conn.close()
 
@@ -641,12 +745,12 @@ def excluir_categoria(categoria_id):
         return jsonify({
             "erro": "Categoria não encontrada."
         }), 404
-
     produtos = conn.execute("""
         SELECT COUNT(*) AS total
         FROM produtos
-        WHERE categoria = ?
-    """, (categoria["nome"],)).fetchone()
+        WHERE categoria_id = ?
+    """, (categoria_id,)).fetchone()
+    
 
     if produtos["total"] > 0:
         conn.close()
@@ -702,7 +806,112 @@ def listar_movimentacoes():
         for movimentacao in movimentacoes
     ])
 
+# ==============================
+# CADASTRAR USUÁRIO
+# ==============================
 
+@app.route("/api/usuarios", methods=["POST"])
+def cadastrar_usuario():
+
+    dados = request.get_json()
+
+    nome = dados.get("nome", "").strip()
+    email = dados.get("email", "").strip().lower()
+    senha = dados.get("senha", "")
+    perfil_id = dados.get("perfil_id")
+
+    if not nome or not email or not senha or not perfil_id:
+        return jsonify({
+            "erro": "Todos os campos são obrigatórios."
+        }), 400
+
+    conn = conectar_banco()
+
+    perfil = conn.execute("""
+        SELECT id
+        FROM perfil
+        WHERE id = ?
+    """, (perfil_id,)).fetchone()
+
+    if not perfil:
+        conn.close()
+
+        return jsonify({
+            "erro": "Perfil não encontrado."
+        }), 404
+
+    senha_hash = generate_password_hash(senha)
+
+    try:
+
+        cursor = conn.execute("""
+            INSERT INTO usuario (
+                nome,
+                email,
+                senha,
+                perfil_id
+            )
+            VALUES (?, ?, ?, ?)
+        """, (
+            nome,
+            email,
+            senha_hash,
+            perfil_id
+        ))
+
+        conn.commit()
+
+        usuario_id = cursor.lastrowid
+
+        conn.close()
+
+        return jsonify({
+            "mensagem": "Usuário cadastrado com sucesso.",
+            "id": usuario_id
+        }), 201
+
+    except sqlite3.IntegrityError:
+
+        conn.close()
+
+        return jsonify({
+            "erro": "Já existe um usuário com este e-mail."
+        }), 409
+
+    # ==============================
+# LISTAR USUÁRIOS
+# ==============================
+
+@app.route("/api/usuarios", methods=["GET"])
+def listar_usuarios():
+
+    conn = conectar_banco()
+
+    usuarios = conn.execute("""
+        SELECT
+            usuario.id,
+            usuario.nome,
+            usuario.email,
+            usuario.perfil_id,
+            perfil.nome AS perfil
+        FROM usuario
+        INNER JOIN perfil
+            ON usuario.perfil_id = perfil.id
+        ORDER BY usuario.nome
+    """).fetchall()
+
+    conn.close()
+
+    return jsonify([
+        {
+            "id": usuario["id"],
+            "nome": usuario["nome"],
+            "email": usuario["email"],
+            "perfil_id": usuario["perfil_id"],
+            "perfil": usuario["perfil"]
+        }
+        for usuario in usuarios
+    ])
 # ==============================
 # INICIAR SERVIDOR
 # ==============================

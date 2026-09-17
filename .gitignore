@@ -1,10 +1,17 @@
+# Banco de dados local
 estoque.db
 
+# Backups e outros bancos SQLite locais
+*.db
+
+# Python
 __pycache__/
 *.pyc
 
+# Ambientes virtuais
 .venv/
 venv/
 env/
 
+# VS Code
 .vscode/
