@@ -160,7 +160,42 @@ def inicializar_banco():
             VALUES (?)
         """, (categoria,))
 
+    # ==============================
+    # ADMINISTRADOR INICIAL
+    # ==============================
 
+    perfil_admin = conn.execute("""
+        SELECT id
+        FROM perfil
+        WHERE nome = ?
+    """, ("Administrador",)).fetchone()
+
+    administrador = conn.execute("""
+        SELECT id
+        FROM usuario
+        WHERE email = ?
+    """, ("admin@easystock.com",)).fetchone()
+
+    if perfil_admin and not administrador:
+
+        senha_admin = generate_password_hash(
+            "Admin123"
+        )
+
+        conn.execute("""
+            INSERT INTO usuario (
+                nome,
+                email,
+                senha,
+                perfil_id
+            )
+            VALUES (?, ?, ?, ?)
+        """, (
+            "Administrador",
+            "admin@easystock.com",
+            senha_admin,
+            perfil_admin["id"]
+        ))
     conn.commit()
     conn.close()
 
