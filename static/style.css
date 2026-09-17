@@ -610,3 +610,157 @@ tr:hover {
     background: #fee2e2;
     color: #991b1b;
 }
+/* ==================================================
+   TELA DE LOGIN
+================================================== */
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+        linear-gradient(
+            135deg,
+            #f4f7fb 0%,
+            #e9eff8 100%
+        );
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.12);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.login-logo h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.login-logo p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.login-card .form-group {
+    margin-bottom: 20px;
+}
+
+.login-card .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.login-card .form-group input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 15px;
+    outline: none;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+.login-card .form-group input:focus {
+    border-color: #2563eb;
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.login-button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.2s,
+        transform 0.1s;
+}
+
+.login-button:hover {
+    background: #1d4ed8;
+}
+
+.login-button:active {
+    transform: scale(0.99);
+}
+
+.login-erro {
+    min-height: 20px;
+    margin: 4px 0 8px;
+    color: #dc2626;
+    font-size: 14px;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+
+    .login-page {
+        padding: 16px;
+    }
+
+    .login-card {
+        padding: 28px 22px;
+    }
+
+}
+/* ==================================================
+   BOTÃO DE LOGOUT
+================================================== */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.btn-logout {
+    padding: 10px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.2s,
+        transform 0.1s;
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.btn-logout:active {
+    transform: scale(0.98);
+}

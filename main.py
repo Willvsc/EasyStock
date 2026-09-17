@@ -1,15 +1,21 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, session, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
+import os
+
 
 app = Flask(__name__)
 
-DATABASE = "estoque.db"
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "easystock-chave-local-desenvolvimento"
+)
 
+DATABASE = "estoque.db"
 
 # ==============================
 # CONEXÃO COM O BANCO
-# ==============================
+# ============================== 
 
 def conectar_banco():
     conn = sqlite3.connect(DATABASE)
@@ -164,6 +170,10 @@ def inicializar_banco():
 
 @app.route("/")
 def pagina_inicial():
+
+    if "usuario_id" not in session:
+        return redirect("/login")
+
     return render_template("index.html")
 
 
@@ -812,7 +822,15 @@ def listar_movimentacoes():
 
 @app.route("/api/usuarios", methods=["POST"])
 def cadastrar_usuario():
+    if "usuario_id" not in session:
+        return jsonify({
+            "erro": "Usuário não autenticado."
+        }), 401
 
+    if session.get("perfil") != "Administrador":
+        return jsonify({
+            "erro": "Acesso permitido apenas para administradores."
+        }), 403
     dados = request.get_json()
 
     nome = dados.get("nome", "").strip()
@@ -885,6 +903,15 @@ def cadastrar_usuario():
 @app.route("/api/usuarios", methods=["GET"])
 def listar_usuarios():
 
+    if "usuario_id" not in session:
+        return jsonify({
+            "erro": "Usuário não autenticado."
+        }), 401
+
+    if session.get("perfil") != "Administrador":
+        return jsonify({
+            "erro": "Acesso permitido apenas para administradores."
+        }), 403
     conn = conectar_banco()
 
     usuarios = conn.execute("""
@@ -915,8 +942,132 @@ def listar_usuarios():
 # ==============================
 # INICIAR SERVIDOR
 # ==============================
+@app.route("/api/login", methods=["POST"])
+def login():
 
+    dados = request.get_json()
 
+    email = dados.get("email", "").strip().lower()
+    senha = dados.get("senha", "")
+
+    if not email or not senha:
+        return jsonify({
+            "erro": "E-mail e senha são obrigatórios."
+        }), 400
+
+    conn = conectar_banco()
+
+    usuario = conn.execute("""
+        SELECT
+            usuario.id,
+            usuario.nome,
+            usuario.email,
+            usuario.senha,
+            usuario.perfil_id,
+            perfil.nome AS perfil
+        FROM usuario
+        INNER JOIN perfil
+            ON usuario.perfil_id = perfil.id
+        WHERE usuario.email = ?
+    """, (email,)).fetchone()
+
+    conn.close()
+
+    if not usuario:
+        return jsonify({
+            "erro": "E-mail ou senha inválidos."
+        }), 401
+
+    if not check_password_hash(
+        usuario["senha"],
+        senha
+    ):
+        return jsonify({
+            "erro": "E-mail ou senha inválidos."
+        }), 401
+
+    session["usuario_id"] = usuario["id"]
+    session["usuario_nome"] = usuario["nome"]
+    session["usuario_email"] = usuario["email"]
+    session["perfil_id"] = usuario["perfil_id"]
+    session["perfil"] = usuario["perfil"]
+
+    return jsonify({
+        "mensagem": "Login realizado com sucesso.",
+        "usuario": {
+            "id": usuario["id"],
+            "nome": usuario["nome"],
+            "email": usuario["email"],
+            "perfil": usuario["perfil"]
+        }
+    }), 200
+
+@app.route("/login")
+def pagina_login():
+    return render_template("login.html")
+
+@app.route("/api/logout", methods=["POST"])
+def logout():
+
+    session.clear()
+
+    return jsonify({
+        "mensagem": "Logout realizado com sucesso."
+    }), 200
+
+@app.route("/api/perfis", methods=["GET"])
+def listar_perfis():
+
+    if "usuario_id" not in session:
+        return jsonify({
+            "erro": "Usuário não autenticado."
+        }), 401
+
+    if session.get("perfil") != "Administrador":
+        return jsonify({
+            "erro": "Acesso permitido apenas para administradores."
+        }), 403
+
+    conn = conectar_banco()
+
+    perfis = conn.execute("""
+        SELECT
+            id,
+            nome,
+            descricao
+        FROM perfil
+        ORDER BY nome
+    """).fetchall()
+
+    conn.close()
+
+    return jsonify([
+        {
+            "id": perfil["id"],
+            "nome": perfil["nome"],
+            "descricao": perfil["descricao"]
+        }
+        for perfil in perfis
+    ])
+
+@app.route("/api/sessao", methods=["GET"])
+def obter_sessao():
+
+    if "usuario_id" not in session:
+        return jsonify({
+            "autenticado": False
+        }), 401
+
+    return jsonify({
+        "autenticado": True,
+        "usuario": {
+            "id": session["usuario_id"],
+            "nome": session["usuario_nome"],
+            "email": session["usuario_email"],
+            "perfil_id": session["perfil_id"],
+            "perfil": session["perfil"]
+        }
+    }), 200
 if __name__ == "__main__":
 
     inicializar_banco()

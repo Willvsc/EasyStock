@@ -21,12 +21,20 @@
 
     <header class="header">
 
-        <div>
-            <h1>📦 Controle de Estoque</h1>
-            <p>Gerencie os produtos do seu mercado</p>
-        </div>
+    <div>
+        <h1>📦 Controle de Estoque</h1>
+        <p>Gerencie os produtos do seu mercado</p>
+    </div>
 
-    </header>
+    <button
+        type="button"
+        id="btnLogout"
+        class="btn-logout"
+    >
+        Sair
+    </button>
+
+</header>
 
 
     <main class="container">
@@ -512,6 +520,141 @@
 
 </section>
 
+<!-- GERENCIAMENTO DE USUÁRIOS -->
+
+<section
+    class="card usuarios-card"
+    id="secaoUsuarios"
+    style="display: none;"
+>
+
+    <div class="estoque-topo">
+
+        <div>
+            <h2>👤 Gerenciamento de usuários</h2>
+
+            <p>
+                Cadastre e consulte os usuários que possuem acesso ao sistema.
+            </p>
+        </div>
+
+    </div>
+
+
+    <form id="formUsuario">
+
+        <div class="form-grid">
+
+            <div class="campo">
+
+                <label for="usuarioNome">
+                    Nome
+                </label>
+
+                <input
+                    type="text"
+                    id="usuarioNome"
+                    placeholder="Nome do usuário"
+                    required
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="usuarioEmail">
+                    E-mail
+                </label>
+
+                <input
+                    type="email"
+                    id="usuarioEmail"
+                    placeholder="usuario@exemplo.com"
+                    required
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="usuarioSenha">
+                    Senha
+                </label>
+
+                <input
+                    type="password"
+                    id="usuarioSenha"
+                    placeholder="Digite uma senha"
+                    required
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="usuarioPerfil">
+                    Perfil
+                </label>
+
+                <select
+                    id="usuarioPerfil"
+                    required
+                >
+
+                    <option value="">
+                        Carregando perfis...
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Cadastrar usuário
+        </button>
+
+        <p
+            id="mensagemUsuario"
+            class="mensagem-usuario"
+        ></p>
+
+    </form>
+
+
+    <div class="tabela-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Perfil</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="tabelaUsuarios">
+
+                <!-- Usuários serão carregados aqui -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
 <!-- MODAL DE EDIÇÃO -->
 
 <div

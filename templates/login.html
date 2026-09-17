@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login | EasyStock</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <main class="login-page">
+
+        <section class="login-card">
+
+            <div class="login-logo">
+                <h1>EasyStock</h1>
+
+                <p>
+                    Sistema de gerenciamento de estoque
+                </p>
+            </div>
+
+
+            <form id="formLogin">
+
+                <div class="form-group">
+
+                    <label for="email">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Digite seu e-mail"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="senha">
+                        Senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <p
+                    id="erroLogin"
+                    class="login-erro"
+                ></p>
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    Entrar
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        const formLogin =
+            document.getElementById("formLogin");
+
+        const erroLogin =
+            document.getElementById("erroLogin");
+
+
+        formLogin.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                erroLogin.textContent = "";
+
+
+                const email =
+                    document.getElementById("email").value;
+
+                const senha =
+                    document.getElementById("senha").value;
+
+
+                try {
+
+                    const resposta = await fetch(
+                        "/api/login",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                email: email,
+                                senha: senha
+                            })
+                        }
+                    );
+
+
+                    const dados =
+                        await resposta.json();
+
+
+                    if (!resposta.ok) {
+
+                        erroLogin.textContent =
+                            dados.erro ||
+                            "Não foi possível realizar o login.";
+
+                        return;
+                    }
+
+
+                    window.location.href = "/";
+
+                }
+
+                catch (erro) {
+
+                    erroLogin.textContent =
+                        "Erro ao conectar com o servidor.";
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

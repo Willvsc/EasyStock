@@ -1654,10 +1654,314 @@ btnLimparFiltros.addEventListener(
 window.addEventListener(
     "load",
     () => {
-
         carregarProdutos();
-
         carregarMovimentacoes();
-
+        verificarSessao();
     }
 );
+const btnLogout = document.getElementById("btnLogout");
+
+if (btnLogout) {
+
+    btnLogout.addEventListener(
+        "click",
+        async function () {
+
+            try {
+
+                const resposta = await fetch(
+                    "/api/logout",
+                    {
+                        method: "POST"
+                    }
+                );
+
+                if (resposta.ok) {
+
+                    window.location.href = "/login";
+
+                }
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro ao realizar logout:",
+                    erro
+                );
+
+            }
+
+        }
+    );
+
+}
+async function carregarPerfisUsuarios() {
+
+    const selectPerfil =
+        document.getElementById("usuarioPerfil");
+
+    if (!selectPerfil) {
+        return;
+    }
+
+    try {
+
+        const resposta =
+            await fetch("/api/perfis");
+
+        if (!resposta.ok) {
+            throw new Error(
+                "Não foi possível carregar os perfis."
+            );
+        }
+
+        const perfis =
+            await resposta.json();
+
+
+        selectPerfil.innerHTML = `
+            <option value="">
+                Selecione um perfil
+            </option>
+        `;
+
+
+        perfis.forEach(
+            function (perfil) {
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    perfil.id;
+
+                option.textContent =
+                    perfil.nome;
+
+                selectPerfil.appendChild(option);
+
+            }
+        );
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar perfis:",
+            erro
+        );
+
+        selectPerfil.innerHTML = `
+            <option value="">
+                Erro ao carregar perfis
+            </option>
+        `;
+
+    }
+
+}
+const formUsuario =
+    document.getElementById("formUsuario");
+
+if (formUsuario) {
+
+    formUsuario.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            const mensagemUsuario =
+                document.getElementById("mensagemUsuario");
+
+            mensagemUsuario.textContent = "";
+
+
+            const nome =
+                document.getElementById("usuarioNome").value.trim();
+
+            const email =
+                document.getElementById("usuarioEmail").value.trim();
+
+            const senha =
+                document.getElementById("usuarioSenha").value;
+
+            const perfilId =
+                document.getElementById("usuarioPerfil").value;
+
+
+            try {
+
+                const resposta = await fetch(
+                    "/api/usuarios",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            nome: nome,
+                            email: email,
+                            senha: senha,
+                            perfil_id: Number(perfilId)
+                        })
+                    }
+                );
+
+
+                const dados =
+                    await resposta.json();
+
+
+                if (!resposta.ok) {
+
+                    mensagemUsuario.textContent =
+                        dados.erro ||
+                        "Não foi possível cadastrar o usuário.";
+
+                    return;
+                }
+
+
+                mensagemUsuario.textContent =
+                    "Usuário cadastrado com sucesso.";
+
+                formUsuario.reset();
+
+                carregarUsuarios();
+            } catch (erro) {
+
+                console.error(
+                    "Erro ao cadastrar usuário:",
+                    erro
+                );
+
+                mensagemUsuario.textContent =
+                    "Erro ao conectar com o servidor.";
+
+            }
+
+        }
+    );
+
+}
+async function carregarUsuarios() {
+
+    const tabelaUsuarios =
+        document.getElementById("tabelaUsuarios");
+
+    if (!tabelaUsuarios) {
+        return;
+    }
+
+    try {
+
+        const resposta =
+            await fetch("/api/usuarios");
+
+        if (!resposta.ok) {
+            throw new Error(
+                "Não foi possível carregar os usuários."
+            );
+        }
+
+        const usuarios =
+            await resposta.json();
+
+
+        tabelaUsuarios.innerHTML = "";
+
+
+        usuarios.forEach(
+            function (usuario) {
+
+                const linha =
+                    document.createElement("tr");
+
+
+                const colunaNome =
+                    document.createElement("td");
+
+                colunaNome.textContent =
+                    usuario.nome;
+
+
+                const colunaEmail =
+                    document.createElement("td");
+
+                colunaEmail.textContent =
+                    usuario.email;
+
+
+                const colunaPerfil =
+                    document.createElement("td");
+
+                colunaPerfil.textContent =
+                    usuario.perfil;
+
+
+                linha.appendChild(colunaNome);
+                linha.appendChild(colunaEmail);
+                linha.appendChild(colunaPerfil);
+
+                tabelaUsuarios.appendChild(linha);
+
+            }
+        );
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar usuários:",
+            erro
+        );
+
+    }
+
+}
+async function verificarSessao() {
+
+    const secaoUsuarios =
+        document.getElementById("secaoUsuarios");
+
+    try {
+
+        const resposta =
+            await fetch("/api/sessao");
+
+
+        if (!resposta.ok) {
+
+            window.location.href = "/login";
+
+            return;
+        }
+
+
+        const dados =
+            await resposta.json();
+
+
+        if (
+            secaoUsuarios &&
+            dados.usuario.perfil === "Administrador"
+        ) {
+
+            secaoUsuarios.style.display = "";
+
+            carregarPerfisUsuarios();
+            carregarUsuarios();
+
+        }
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao verificar sessão:",
+            erro
+        );
+
+    }
+
+}
