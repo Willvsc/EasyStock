@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, render_template, session, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import os
+import re
 
 
 app = Flask(__name__)
@@ -289,6 +290,18 @@ def adicionar_produto():
             "erro": "Preencha todos os campos obrigatórios."
         }), 400
 
+    if len(nome) > 100:
+
+        return jsonify({
+        "erro": "O nome do produto deve ter no máximo 100 caracteres."
+    }), 400
+
+
+    if len(sku) > 30:
+
+        return jsonify({
+        "erro": "O SKU deve ter no máximo 30 caracteres."
+    }), 400
 
     # Conversão dos valores numéricos
 
@@ -306,15 +319,19 @@ def adicionar_produto():
 
     # Impedir valores negativos
 
-    if preco < 0 or quantidade < 0:
+   
+    if preco <= 0:
 
         return jsonify({
-            "erro": "Preço e quantidade não podem ser negativos."
-        }), 400
+        "erro": "O preço deve ser maior que zero."
+    }), 400
 
 
-    conn = conectar_banco()
+    if quantidade < 0:
 
+        return jsonify({
+        "erro": "A quantidade não pode ser negativa."
+    }), 400
 
     # Localizar a categoria selecionada
 
@@ -397,6 +414,18 @@ def editar_produto(produto_id):
             "erro": "Preencha todos os campos obrigatórios."
         }), 400
 
+    if len(nome) > 100:
+
+        return jsonify({
+        "erro": "O nome do produto deve ter no máximo 100 caracteres."
+    }), 400
+
+
+    if len(sku) > 30:
+
+        return jsonify({
+        "erro": "O SKU deve ter no máximo 30 caracteres."
+    }), 400
 
     # Converter preço
 
@@ -413,11 +442,11 @@ def editar_produto(produto_id):
 
     # Impedir preço negativo
 
-    if preco < 0:
+    if preco <= 0:
 
         return jsonify({
-            "erro": "O preço não pode ser negativo."
-        }), 400
+        "erro": "O preço deve ser maior que zero."
+    }), 400
 
 
     conn = conectar_banco()
@@ -862,6 +891,7 @@ def listar_movimentacoes():
 
 @app.route("/api/usuarios", methods=["POST"])
 def cadastrar_usuario():
+
     if "usuario_id" not in session:
         return jsonify({
             "erro": "Usuário não autenticado."
@@ -871,6 +901,7 @@ def cadastrar_usuario():
         return jsonify({
             "erro": "Acesso permitido apenas para administradores."
         }), 403
+
     dados = request.get_json()
 
     nome = dados.get("nome", "").strip()
@@ -878,11 +909,39 @@ def cadastrar_usuario():
     senha = dados.get("senha", "")
     perfil_id = dados.get("perfil_id")
 
+    # ==============================
+    # VALIDAÇÕES
+    # ==============================
+
     if not nome or not email or not senha or not perfil_id:
         return jsonify({
             "erro": "Todos os campos são obrigatórios."
         }), 400
 
+    if len(nome) > 100:
+        return jsonify({
+            "erro": "O nome do usuário deve ter no máximo 100 caracteres."
+        }), 400
+
+    padrao_email = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+
+    if not re.match(padrao_email, email):
+        return jsonify({
+            "erro": "Informe um endereço de e-mail válido."
+        }), 400
+
+    if len(email) > 150:
+        return jsonify({
+            "erro": "O e-mail deve ter no máximo 150 caracteres."
+        }), 400
+
+    if len(senha) < 6:
+        return jsonify({
+            "erro": "A senha deve possuir pelo menos 6 caracteres."
+        }), 400
+
+    conn = conectar_banco()
+    
     conn = conectar_banco()
 
     perfil = conn.execute("""
