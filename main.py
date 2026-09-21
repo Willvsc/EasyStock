@@ -561,12 +561,17 @@ def alterar_quantidade(produto_id):
 
     else:
 
-        nova_quantidade = max(
-            0,
-            quantidade_atual - 1
-        )
+        if quantidade_atual <= 0:
 
-        tipo_movimentacao = "saida"
+            conn.close()
+
+        return jsonify({
+            "erro": "Não é possível realizar a saída. O produto está sem estoque."
+        }), 400
+
+    nova_quantidade = quantidade_atual - 1
+
+    tipo_movimentacao = "saida"
 
 
     # ==============================
