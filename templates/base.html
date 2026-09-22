@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}EasyStock{% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="sidebar-logo-icone">
+                📦
+            </div>
+
+            <div>
+                <h2>EasyStock</h2>
+                <span>GESTÃO DE ESTOQUE</span>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+            <a href="/" class="sidebar-item {% if pagina_ativa == 'dashboard' %}ativo{% endif %}">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="/produtos" class="sidebar-item {% if pagina_ativa == 'produtos' %}ativo{% endif %}">
+                <span>◇</span>
+                Produtos
+            </a>
+
+            <a href="/categorias" class="sidebar-item {% if pagina_ativa == 'categorias' %}ativo{% endif %}">
+                <span>⌑</span>
+                Categorias
+            </a>
+
+            <a href="/movimentacoes" class="sidebar-item {% if pagina_ativa == 'movimentacoes' %}ativo{% endif %}">
+                <span>↕</span>
+                Movimentações
+            </a>
+
+            <a href="/historico" class="sidebar-item {% if pagina_ativa == 'historico' %}ativo{% endif %}">
+                <span>▤</span>
+                Histórico
+            </a>
+
+            {% if session.get("perfil") == "Administrador" %}
+
+            <a href="/usuarios" class="sidebar-item {% if pagina_ativa == 'usuarios' %}ativo{% endif %}">
+                <span>♙</span>
+                Usuários
+            </a>
+
+            {% endif %}
+
+        </nav>
+
+
+        <div class="sidebar-rodape">
+
+            <button type="button" id="btnLogout" class="sidebar-sair">
+                <span>↪</span>
+                Sair
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ÁREA PRINCIPAL -->
+
+    <div class="app-conteudo">
+
+        <!-- CABEÇALHO -->
+
+        <header class="topbar">
+
+            <div class="topbar-estabelecimento">
+
+                <span>Estabelecimento</span>
+
+                <strong>
+                    Mercado Modelo
+                </strong>
+
+            </div>
+
+
+            <div class="topbar-usuario">
+
+                <div class="usuario-avatar">
+                    {{ session.get("usuario_nome", "U")[0] }}
+                </div>
+
+                <div class="usuario-info">
+
+                    <strong>
+                        {{ session.get("usuario_nome", "Usuário") }}
+                    </strong>
+
+                    <span>
+                        {{ session.get("perfil", "") }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTEÚDO ESPECÍFICO DE CADA TELA -->
+
+        <main class="pagina-conteudo">
+
+            {% block conteudo %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+
+</html>

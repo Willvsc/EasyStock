@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | EasyStock
+{% endblock %}
+
+
+{% block conteudo %}
+
+<div class="pagina-cabecalho">
+
+    <div>
+        <h1>Dashboard</h1>
+        <p>Visão geral do seu estoque</p>
+    </div>
+
+    <a href="/movimentacoes" class="btn btn-primary">
+        + Nova movimentação
+    </a>
+
+</div>
+
+
+<!-- INDICADORES -->
+
+<section class="dashboard-resumo">
+
+    <div class="dashboard-card">
+
+        <div>
+            <span class="dashboard-label">
+                Total de produtos
+            </span>
+
+            <strong id="totalProdutos">
+                0
+            </strong>
+
+            <small>
+                Produtos cadastrados
+            </small>
+        </div>
+
+        <div class="dashboard-icone">
+            📦
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <div>
+            <span class="dashboard-label">
+                Itens em estoque
+            </span>
+
+            <strong id="totalItens">
+                0
+            </strong>
+
+            <small>
+                Em todas as categorias
+            </small>
+        </div>
+
+        <div class="dashboard-icone">
+            ◇
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <div>
+            <span class="dashboard-label">
+                Estoque baixo
+            </span>
+
+            <strong id="estoqueBaixo">
+                0
+            </strong>
+
+            <small>
+                Precisam de atenção
+            </small>
+        </div>
+
+        <div class="dashboard-icone">
+            ⚠
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <div>
+            <span class="dashboard-label">
+                Movimentações
+            </span>
+
+            <strong id="totalMovimentacoes">
+                0
+            </strong>
+
+            <small>
+                Registros realizados
+            </small>
+        </div>
+
+        <div class="dashboard-icone">
+            ↻
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CONTEÚDO INFERIOR -->
+
+<section class="dashboard-grid">
+
+    <div class="card dashboard-movimentacoes">
+
+        <div class="card-header">
+
+            <div>
+                <h2>Movimentações de estoque</h2>
+
+                <p>
+                    Entradas e saídas registradas no estoque
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-movimentacoes-resumo">
+
+            <div class="resumo-entrada">
+
+                <span>Entradas</span>
+
+                <strong id="totalEntradas">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="resumo-saida">
+
+                <span>Saídas</span>
+
+                <strong id="totalSaidas">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card dashboard-baixo">
+
+        <div class="card-header">
+
+            <div>
+                <h2>Estoque baixo</h2>
+
+                <p>
+                    Produtos que precisam de atenção
+                </p>
+            </div>
+
+            <a href="/produtos">
+                Ver todos
+            </a>
+
+        </div>
+
+
+        <div id="listaEstoqueBaixo">
+
+            <p class="dashboard-vazio">
+                Nenhum produto com estoque baixo.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

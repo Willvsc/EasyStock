@@ -18,7 +18,49 @@
 </head>
 
 <body>
+<!-- MENU LATERAL -->
 
+<aside class="sidebar">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icone">📦</div>
+
+        <div>
+            <h2>EasyStock</h2>
+            <span>Controle de estoque</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-menu">
+
+        <button type="button" class="sidebar-item ativo" data-secao="secaoDashboard">
+            <span>▦</span>
+            Dashboard
+        </button>
+
+        <button type="button" class="sidebar-item" data-secao="secaoProdutos">
+            <span>📦</span>
+            Produtos
+        </button>
+
+        <button type="button" class="sidebar-item" data-secao="secaoCategorias">
+            <span>📂</span>
+            Categorias
+        </button>
+
+        <button type="button" class="sidebar-item" data-secao="secaoHistorico">
+            <span>↕</span>
+            Movimentações
+        </button>
+
+        <button type="button" class="sidebar-item sidebar-item-admin" data-secao="secaoUsuarios" style="display: none;">
+            <span>👤</span>
+            Usuários
+        </button>
+
+    </nav>
+
+</aside>
     <header class="header">
 
     <div>
@@ -40,7 +82,7 @@
     <main class="container">
 <!-- DASHBOARD -->
 
-<section class="dashboard">
+<section class="dashboard" id="secaoDashboard">
 
     <div class="dashboard-card">
 
@@ -171,7 +213,7 @@
 </section>
         <!-- FORMULÁRIO -->
 
-        <section class="card">
+        <section class="card" id="secaoCadastroProduto">
 
             <div class="card-header">
                 <div>
@@ -276,7 +318,7 @@
 
         <!-- ESTOQUE -->
 
-        <section class="card">
+        <section class="card" id="secaoProdutos">
 
             <div class="estoque-topo">
 
@@ -357,7 +399,7 @@
     </main>
 <!-- GERENCIAMENTO DE CATEGORIAS -->
 
-<section class="card categorias-card">
+<section class="card categorias-card" id="secaoCategorias">
 
     <div class="estoque-topo">
 
@@ -391,7 +433,7 @@
 </section>
 <!-- HISTÓRICO DE MOVIMENTAÇÕES -->
 
-<section class="card historico-card">
+<section class="card historico-card" id="secaoHistorico">
 
 <div class="estoque-topo">
 

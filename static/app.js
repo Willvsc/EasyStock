@@ -20,10 +20,14 @@ const btnLimparFiltros =
 const btnNovaCategoria =
     document.getElementById("btnNovaCategoria");
 
-btnNovaCategoria.addEventListener(
-    "click",
-    abrirNovaCategoria
-);
+if (btnNovaCategoria) {
+
+    btnNovaCategoria.addEventListener(
+        "click",
+        abrirNovaCategoria
+    );
+
+}
 
 let produtos = [];
 
@@ -243,9 +247,11 @@ function renderizarProdutos() {
 // CADASTRAR PRODUTO
 // ==============================
 
-formulario.addEventListener(
-    "submit",
-    async (evento) => {
+if (formulario) {
+
+    formulario.addEventListener(
+        "submit",
+        async (evento) => {
 
         evento.preventDefault();
 
@@ -325,6 +331,7 @@ formulario.addEventListener(
 
     }
 );
+}
 
 
 // ==============================
@@ -457,10 +464,14 @@ async function excluirProduto(id) {
 // PESQUISA DE PRODUTOS
 // ==============================
 
-pesquisa.addEventListener(
-    "input",
-    renderizarProdutos
-);
+if (pesquisa) {
+
+    pesquisa.addEventListener(
+        "input",
+        renderizarProdutos
+    );
+
+}
 
 
 // ==============================
@@ -885,7 +896,15 @@ async function carregarCategorias() {
 }
 
 
-carregarCategorias();
+if (
+    document.getElementById("listaCategorias") ||
+    document.getElementById("categoria") ||
+    document.getElementById("editarCategoria")
+) {
+
+    carregarCategorias();
+
+}
 
 
 // ==============================
@@ -1613,38 +1632,60 @@ async function carregarMovimentacoes() {
 // FILTROS DO HISTÓRICO
 // ==============================
 
-filtroProduto.addEventListener(
-    "input",
-    carregarMovimentacoes
-);
+if (filtroProduto) {
+
+    filtroProduto.addEventListener(
+        "input",
+        carregarMovimentacoes
+    );
+
+}
 
 
-filtroTipo.addEventListener(
-    "change",
-    carregarMovimentacoes
-);
+if (filtroTipo) {
+
+    filtroTipo.addEventListener(
+        "change",
+        carregarMovimentacoes
+    );
+
+}
 
 
-filtroData.addEventListener(
-    "change",
-    carregarMovimentacoes
-);
+if (filtroData) {
+
+    filtroData.addEventListener(
+        "change",
+        carregarMovimentacoes
+    );
+
+}
 
 
-btnLimparFiltros.addEventListener(
-    "click",
-    () => {
+if (btnLimparFiltros) {
 
-        filtroProduto.value = "";
+    btnLimparFiltros.addEventListener(
+        "click",
+        () => {
 
-        filtroTipo.value = "todos";
+            if (filtroProduto) {
+                filtroProduto.value = "";
+            }
 
-        filtroData.value = "";
+            if (filtroTipo) {
+                filtroTipo.value = "todos";
+            }
 
-        carregarMovimentacoes();
+            if (filtroData) {
+                filtroData.value = "";
+            }
 
-    }
-);
+            carregarMovimentacoes();
+
+        }
+    );
+
+}
 
 
 // ==============================
@@ -1654,47 +1695,43 @@ btnLimparFiltros.addEventListener(
 window.addEventListener(
     "load",
     () => {
-        carregarProdutos();
-        carregarMovimentacoes();
-        verificarSessao();
-    }
-);
-const btnLogout = document.getElementById("btnLogout");
 
-if (btnLogout) {
+        // ==============================
+        // PÁGINA DE PRODUTOS
+        // ==============================
 
-    btnLogout.addEventListener(
-        "click",
-        async function () {
+        if (
+            document.getElementById("produtoForm") ||
+            document.getElementById("tabelaProdutos")
+        ) {
 
-            try {
-
-                const resposta = await fetch(
-                    "/api/logout",
-                    {
-                        method: "POST"
-                    }
-                );
-
-                if (resposta.ok) {
-
-                    window.location.href = "/login";
-
-                }
-
-            } catch (erro) {
-
-                console.error(
-                    "Erro ao realizar logout:",
-                    erro
-                );
-
-            }
+            carregarProdutos();
 
         }
-    );
 
-}
+
+        // ==============================
+        // PÁGINA DE HISTÓRICO
+        // ==============================
+
+        if (
+            document.getElementById("tabelaMovimentacoes") &&
+            document.getElementById("filtroProduto")
+        ) {
+
+            carregarMovimentacoes();
+
+        }
+
+
+        // ==============================
+        // SESSÃO
+        // ==============================
+
+        verificarSessao();
+
+    }
+);
 async function carregarPerfisUsuarios() {
 
     const selectPerfil =
@@ -1965,3 +2002,187 @@ async function verificarSessao() {
     }
 
 }
+// ==============================
+// NOVO DASHBOARD
+// ==============================
+
+async function carregarNovoDashboard() {
+
+    // Executa somente se estivermos
+    // na nova página de Dashboard.
+    const totalProdutosElemento =
+        document.getElementById("totalProdutos");
+
+    if (!totalProdutosElemento) {
+        return;
+    }
+
+    try {
+
+        // ==============================
+        // PRODUTOS
+        // ==============================
+
+        const respostaProdutos =
+            await fetch("/api/produtos");
+
+        if (!respostaProdutos.ok) {
+            throw new Error(
+                "Não foi possível carregar os produtos."
+            );
+        }
+
+        const produtos =
+            await respostaProdutos.json();
+
+
+        const totalProdutos =
+            produtos.length;
+
+        const totalItens =
+            produtos.reduce(
+                (total, produto) =>
+                    total + Number(produto.quantidade || 0),
+                0
+            );
+
+        const produtosEstoqueBaixo =
+            produtos.filter(
+                produto =>
+                    Number(produto.quantidade) > 0 &&
+                    Number(produto.quantidade) <= 5
+            );
+
+
+        document.getElementById(
+            "totalProdutos"
+        ).textContent = totalProdutos;
+
+
+        document.getElementById(
+            "totalItens"
+        ).textContent = totalItens;
+
+
+        document.getElementById(
+            "estoqueBaixo"
+        ).textContent =
+            produtosEstoqueBaixo.length;
+
+
+        // ==============================
+        // MOVIMENTAÇÕES
+        // ==============================
+
+        const respostaMovimentacoes =
+            await fetch("/api/movimentacoes");
+
+        if (!respostaMovimentacoes.ok) {
+            throw new Error(
+                "Não foi possível carregar as movimentações."
+            );
+        }
+
+        const movimentacoes =
+            await respostaMovimentacoes.json();
+
+
+        const entradas =
+            movimentacoes.filter(
+                movimentacao =>
+                    movimentacao.tipo === "entrada"
+            );
+
+        const saidas =
+            movimentacoes.filter(
+                movimentacao =>
+                    movimentacao.tipo === "saida"
+            );
+
+
+        document.getElementById(
+            "totalMovimentacoes"
+        ).textContent =
+            movimentacoes.length;
+
+
+        document.getElementById(
+            "totalEntradas"
+        ).textContent =
+            entradas.length;
+
+
+        document.getElementById(
+            "totalSaidas"
+        ).textContent =
+            saidas.length;
+
+
+        // ==============================
+        // LISTA DE ESTOQUE BAIXO
+        // ==============================
+
+        const lista =
+            document.getElementById(
+                "listaEstoqueBaixo"
+            );
+
+        if (!lista) {
+            return;
+        }
+
+
+        if (produtosEstoqueBaixo.length === 0) {
+
+            lista.innerHTML = `
+                <p class="dashboard-vazio">
+                    Nenhum produto com estoque baixo.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        lista.innerHTML =
+            produtosEstoqueBaixo
+                .slice(0, 5)
+                .map(produto => `
+                    <div class="dashboard-produto-baixo">
+
+                        <div>
+                            <strong>
+                                ${produto.nome}
+                            </strong>
+
+                            <span>
+                                ${produto.sku}
+                                ·
+                                ${produto.categoria}
+                            </span>
+                        </div>
+
+                        <span class="dashboard-quantidade-baixa">
+                            ${produto.quantidade} un.
+                        </span>
+
+                    </div>
+                `)
+                .join("");
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar Dashboard:",
+            erro
+        );
+
+    }
+
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    carregarNovoDashboard
+);

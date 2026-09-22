@@ -210,7 +210,10 @@ def pagina_inicial():
     if "usuario_id" not in session:
         return redirect("/login")
 
-    return render_template("index.html")
+    return render_template(
+        "dashboard.html",
+        pagina_ativa="dashboard"
+    )
 
 
 # ==============================
@@ -332,6 +335,10 @@ def adicionar_produto():
         return jsonify({
         "erro": "A quantidade não pode ser negativa."
     }), 400
+
+    
+    conn = conectar_banco()
+
 
     # Localizar a categoria selecionada
 
