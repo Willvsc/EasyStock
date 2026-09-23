@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}
+Produtos | EasyStock
+{% endblock %}
+
+{% block conteudo %}
+
+<!-- CABEÇALHO -->
+
+<div class="pagina-cabecalho">
+
+    <div>
+        <h1>Produtos</h1>
+        <p>
+            Gerencie os produtos cadastrados no estoque
+        </p>
+    </div>
+
+    <button type="button" class="btn btn-primary" id="btnNovoProduto">
+        + Novo produto
+    </button>
+
+</div>
+
+
+<!-- CARD PRINCIPAL -->
+
+<section class="card produtos-card">
+
+    <!-- FILTROS -->
+
+    <div class="produtos-filtros">
+
+        <div class="campo-pesquisa">
+
+            <input type="text" id="pesquisa" placeholder="Pesquisar por nome ou SKU...">
+
+        </div>
+
+        <select id="filtroCategoriaProdutos">
+
+            <option value="">
+                Todas as categorias
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- TABELA -->
+
+    <div class="tabela-container">
+
+        <table class="tabela-produtos">
+
+            <thead>
+
+                <tr>
+                    <th>Produto</th>
+                    <th>Categoria</th>
+                    <th>Preço</th>
+                    <th>Quantidade</th>
+                    <th>SKU</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="tabelaProdutos">
+
+                <!-- Produtos carregados pelo JavaScript -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ESTADO VAZIO -->
+
+    <div id="semProdutos" class="sem-produtos" style="display: none;">
+
+        <div>📦</div>
+
+        <h3>Nenhum produto encontrado</h3>
+
+        <p>
+            Cadastre um produto ou altere os filtros da pesquisa.
+        </p>
+
+    </div>
+
+
+    <!-- RODAPÉ -->
+
+    <div class="produtos-rodape">
+
+        <span id="contador">
+            0 produtos cadastrados
+        </span>
+
+    </div>
+
+</section>
+
+
+<!-- MENSAGENS -->
+
+<div id="mensagem" class="mensagem"></div>
+
+<!-- MODAL NOVO PRODUTO -->
+<div id="modalNovoProduto" class="modal-overlay">
+
+    <div class="modal-produto">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Novo produto</h2>
+                <p>Cadastre um novo produto no estoque</p>
+            </div>
+
+            <button type="button" class="modal-fechar" id="btnFecharNovoProduto">
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="produtoForm">
+
+            <div class="modal-form-grid">
+
+                <div class="form-grupo form-grupo-completo">
+                    <label for="nome">
+                        Nome do produto
+                    </label>
+
+                    <input type="text" id="nome" required maxlength="100" placeholder="Ex.: Arroz 1kg">
+                </div>
+
+
+                <div class="form-grupo">
+                    <label for="categoria">
+                        Categoria
+                    </label>
+
+                    <select id="categoria" required>
+                        <option value="">
+                            Selecione uma categoria
+                        </option>
+                    </select>
+                </div>
+
+
+                <div class="form-grupo">
+                    <label for="sku">
+                        SKU
+                    </label>
+
+                    <input type="text" id="sku" required maxlength="30" placeholder="Ex.: ARR001">
+                </div>
+
+
+                <div class="form-grupo">
+                    <label for="preco">
+                        Preço
+                    </label>
+
+                    <input type="number" id="preco" required min="0.01" step="0.01" placeholder="0,00">
+                </div>
+
+
+                <div class="form-grupo">
+                    <label for="quantidade">
+                        Quantidade inicial
+                    </label>
+
+                    <input type="number" id="quantidade" required min="0" value="0">
+                </div>
+
+            </div>
+
+
+            <div class="modal-acoes">
+
+                <button type="button" class="btn btn-secundario" id="btnCancelarNovoProduto">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    Cadastrar produto
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<!-- MODAL EDITAR PRODUTO -->
+<div id="modalEdicao" class="modal-overlay">
+
+    <div class="modal-produto">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Editar produto</h2>
+                <p>Atualize as informações do produto</p>
+            </div>
+
+            <button type="button" class="modal-fechar" onclick="fecharEdicao()">
+                ×
+            </button>
+
+        </div>
+
+
+        <form onsubmit="salvarEdicao(event)">
+
+            <input type="hidden" id="editarId">
+
+
+            <div class="modal-form-grid">
+
+                <div class="form-grupo form-grupo-completo">
+
+                    <label for="editarNome">
+                        Nome do produto
+                    </label>
+
+                    <input type="text" id="editarNome" maxlength="100" required>
+
+                </div>
+
+
+                <div class="form-grupo">
+
+                    <label for="editarCategoria">
+                        Categoria
+                    </label>
+
+                    <select id="editarCategoria" required>
+                        <option value="">
+                            Selecione uma categoria
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="form-grupo">
+
+                    <label for="editarSku">
+                        SKU
+                    </label>
+
+                    <input type="text" id="editarSku" maxlength="30" required>
+
+                </div>
+
+
+                <div class="form-grupo">
+
+                    <label for="editarPreco">
+                        Preço
+                    </label>
+
+                    <input type="number" id="editarPreco" min="0.01" step="0.01" required>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-acoes">
+
+                <button type="button" class="btn btn-secundario" onclick="fecharEdicao()">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    Salvar alterações
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<!-- MODAL EXCLUIR PRODUTO -->
+<div id="modalExcluirProduto" class="modal-overlay">
+
+    <div class="modal-produto modal-exclusao">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Excluir produto</h2>
+                <p>Esta ação não poderá ser desfeita.</p>
+            </div>
+
+            <button type="button" class="modal-fechar" id="btnFecharExcluirProduto">
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-exclusao-conteudo">
+
+            <div class="modal-exclusao-icone">
+                🗑️
+            </div>
+
+            <div>
+                <h3>Tem certeza que deseja excluir este produto?</h3>
+
+                <p>
+                    O produto
+                    <strong id="nomeProdutoExcluir"></strong>
+                    será removido do estoque.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="modal-acoes">
+
+            <button type="button" class="btn btn-secundario" id="btnCancelarExcluirProduto">
+                Cancelar
+            </button>
+
+            <button type="button" class="btn btn-perigo" id="btnConfirmarExcluirProduto">
+                Excluir produto
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

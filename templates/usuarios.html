@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}
+Usuários e perfis | EasyStock
+{% endblock %}
+
+{% block conteudo %}
+
+<!-- CABEÇALHO -->
+<div class="pagina-cabecalho">
+
+    <div>
+        <h1>Usuários e perfis</h1>
+        <p>
+            Gerencie acessos, perfis e permissões do sistema.
+        </p>
+    </div>
+
+    <button type="button" class="btn btn-primario" id="btnNovoUsuario">
+        + Novo usuário
+    </button>
+
+</div>
+
+
+<!-- TABELA DE USUÁRIOS -->
+<section class="card usuarios-card">
+
+    <div class="tabela-container">
+
+        <table class="tabela-usuarios">
+
+            <thead>
+                <tr>
+                    <th>NOME</th>
+                    <th>E-MAIL</th>
+                    <th>PERFIL</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+
+            <tbody id="tabelaUsuarios">
+                <!-- Usuários carregados pelo JavaScript -->
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div id="semUsuarios" class="sem-produtos" style="display: none;">
+        <div>👤</div>
+
+        <h3>Nenhum usuário encontrado</h3>
+
+        <p>
+            Os usuários cadastrados aparecerão aqui.
+        </p>
+    </div>
+
+</section>
+
+
+<!-- PERFIS E PERMISSÕES -->
+<div class="usuarios-secao-titulo">
+    <h2>Perfis e permissões</h2>
+</div>
+
+
+<div class="perfis-grid">
+
+    <!-- ADMINISTRADOR -->
+    <section class="card perfil-card">
+
+        <div class="perfil-card-topo">
+
+            <div class="perfil-identificacao">
+
+                <div class="perfil-icone">
+                    🛡
+                </div>
+
+                <div>
+                    <h3>Administrador</h3>
+
+                    <p>
+                        Acesso completo às funções de gestão.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="perfil-permissoes">
+
+            <span>✓ Gerenciar produtos</span>
+            <span>✓ Gerenciar categorias</span>
+            <span>✓ Registrar movimentações</span>
+            <span>✓ Consultar histórico</span>
+            <span>✓ Gerenciar usuários</span>
+
+        </div>
+
+    </section>
+
+
+    <!-- FUNCIONÁRIO -->
+    <section class="card perfil-card">
+
+        <div class="perfil-card-topo">
+
+            <div class="perfil-identificacao">
+
+                <div class="perfil-icone">
+                    👤
+                </div>
+
+                <div>
+                    <h3>Funcionário</h3>
+
+                    <p>
+                        Acesso às operações diárias do estoque.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="perfil-permissoes">
+
+            <span>✓ Consultar produtos</span>
+            <span>✓ Registrar movimentações</span>
+            <span>✓ Consultar histórico</span>
+
+        </div>
+
+    </section>
+
+</div>
+
+<!-- MODAL NOVO USUÁRIO -->
+<div id="modalNovoUsuario" class="modal-overlay" style="display: none;">
+
+    <div class="modal">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Novo usuário</h2>
+                <p>
+                    Cadastre um novo usuário para acessar o sistema.
+                </p>
+            </div>
+
+            <button type="button" class="modal-fechar" id="btnFecharNovoUsuario" aria-label="Fechar">
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="formNovoUsuario">
+
+            <div class="modal-corpo">
+
+                <div class="form-grupo">
+                    <label for="novoUsuarioNome">
+                        Nome
+                    </label>
+
+                    <input type="text" id="novoUsuarioNome" maxlength="100" placeholder="Nome completo" required>
+                </div>
+
+
+                <div class="form-grupo">
+                    <label for="novoUsuarioEmail">
+                        E-mail
+                    </label>
+
+                    <input type="email" id="novoUsuarioEmail" maxlength="150" placeholder="usuario@exemplo.com"
+                        required>
+                </div>
+
+
+                <div class="form-grupo">
+                    <label for="novoUsuarioSenha">
+                        Senha
+                    </label>
+
+                    <input type="password" id="novoUsuarioSenha" minlength="6" placeholder="Mínimo de 6 caracteres"
+                        required>
+                </div>
+
+
+                <div class="form-grupo">
+                    <label for="novoUsuarioPerfil">
+                        Perfil
+                    </label>
+
+                    <select id="novoUsuarioPerfil" required>
+                        <option value="">
+                            Selecione um perfil
+                        </option>
+                    </select>
+                </div>
+
+
+                <div id="erroNovoUsuario" class="movimentacao-erro"></div>
+
+            </div>
+
+
+            <div class="modal-rodape">
+
+                <button type="button" class="btn btn-secundario" id="btnCancelarNovoUsuario">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primario">
+                    Cadastrar usuário
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div id="mensagem" class="mensagem"></div>
+
+<!-- MODAL EDITAR USUÁRIO -->
+<div id="modalEditarUsuario" class="modal-overlay" style="display: none;">
+    <div class="modal">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Editar usuário</h2>
+                <p>Atualize os dados e o perfil do usuário.</p>
+            </div>
+
+            <button type="button" class="modal-fechar" id="btnFecharEditarUsuario" aria-label="Fechar">
+                ×
+            </button>
+
+        </div>
+
+        <form id="formEditarUsuario">
+
+            <div class="modal-corpo">
+
+                <input type="hidden" id="editarUsuarioId">
+
+                <div class="form-grupo">
+                    <label for="editarUsuarioNome">
+                        Nome
+                    </label>
+
+                    <input type="text" id="editarUsuarioNome" maxlength="100" required>
+                </div>
+
+                <div class="form-grupo">
+                    <label for="editarUsuarioEmail">
+                        E-mail
+                    </label>
+
+                    <input type="email" id="editarUsuarioEmail" maxlength="150" required>
+                </div>
+
+                <div class="form-grupo">
+                    <label for="editarUsuarioPerfil">
+                        Perfil
+                    </label>
+
+                    <select id="editarUsuarioPerfil" required>
+                        <option value="">
+                            Selecione um perfil
+                        </option>
+                    </select>
+                </div>
+
+                <div id="erroEditarUsuario" class="movimentacao-erro"></div>
+
+            </div>
+
+            <div class="modal-rodape">
+
+                <button type="button" class="btn btn-secundario" id="btnCancelarEditarUsuario">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primario">
+                    Salvar alterações
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+<!-- MODAL EXCLUIR USUÁRIO -->
+<div id="modalExcluirUsuario" class="modal-overlay" style="display: none;">
+    <div class="modal modal-exclusao">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Excluir usuário</h2>
+                <p>
+                    Esta ação não poderá ser desfeita.
+                </p>
+            </div>
+
+            <button type="button" class="modal-fechar" id="btnFecharExcluirUsuario" aria-label="Fechar">
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-corpo">
+
+            <input type="hidden" id="excluirUsuarioId">
+
+            <p class="texto-confirmacao-exclusao">
+                Tem certeza que deseja excluir
+                <strong id="excluirUsuarioNome"></strong>?
+            </p>
+
+            <div id="erroExcluirUsuario" class="movimentacao-erro"></div>
+
+        </div>
+
+        <div class="modal-rodape">
+
+            <button type="button" class="btn btn-secundario" id="btnCancelarExcluirUsuario">
+                Cancelar
+            </button>
+
+            <button type="button" class="btn btn-perigo" id="btnConfirmarExcluirUsuario">
+                Excluir usuário
+            </button>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

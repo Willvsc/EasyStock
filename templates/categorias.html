@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}
+Categorias | EasyStock
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="pagina-cabecalho">
+
+    <div>
+        <h1>Categorias</h1>
+        <p>
+            Organize os produtos por categorias
+        </p>
+    </div>
+
+    <button type="button" class="btn btn-primary" id="btnNovaCategoria">
+        + Nova categoria
+    </button>
+
+</div>
+
+
+<section class="card categorias-card">
+
+    <div class="categorias-tabela">
+    
+        <div class="categorias-tabela-cabecalho">
+    
+            <div>
+                NOME DA CATEGORIA
+            </div>
+    
+            <div>
+                QUANTIDADE DE PRODUTOS
+            </div>
+    
+            <div>
+                AÇÕES
+            </div>
+    
+        </div>
+    
+    
+        <div id="listaCategorias" class="lista-categorias">
+            <!-- Categorias serão carregadas aqui -->
+        </div>
+    
+    </div>
+
+    <div id="semCategorias" class="sem-produtos" style="display: none;">
+
+        <div>🏷️</div>
+
+        <h3>Nenhuma categoria cadastrada</h3>
+
+        <p>
+            Crie uma categoria para organizar
+            os produtos do estoque.
+        </p>
+
+    </div>
+
+</section>
+
+
+<div id="mensagem" class="mensagem"></div>
+
+<!-- MODAL NOVA CATEGORIA -->
+<div id="modalCategoria" class="modal-overlay">
+
+    <div class="modal-produto modal-categoria">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Nova categoria</h2>
+                <p>
+                    Crie uma categoria para organizar
+                    os produtos do estoque
+                </p>
+            </div>
+
+            <button type="button" class="modal-fechar" id="btnFecharCategoria">
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="formCategoria" onsubmit="salvarNovaCategoria(event)">
+
+            <div class="form-grupo">
+
+                <label for="novaCategoria">
+                    Nome da categoria
+                </label>
+
+                <input type="text" id="novaCategoria" required maxlength="100" placeholder="Ex.: Bebidas"
+                    autocomplete="off">
+
+            </div>
+
+
+            <div class="modal-acoes">
+
+                <button type="button" class="btn btn-secundario" id="btnCancelarCategoria">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    Cadastrar categoria
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<!-- MODAL EDITAR CATEGORIA -->
+<div id="modalEditarCategoria" class="modal-overlay">
+
+    <div class="modal-produto modal-categoria">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Editar categoria</h2>
+                <p>
+                    Atualize o nome da categoria
+                </p>
+            </div>
+
+            <button type="button" class="modal-fechar" id="btnFecharEditarCategoria">
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="formEditarCategoria">
+
+            <input type="hidden" id="editarCategoriaId">
+
+
+            <div class="form-grupo">
+
+                <label for="editarNomeCategoria">
+                    Nome da categoria
+                </label>
+
+                <input type="text" id="editarNomeCategoria" required maxlength="100" autocomplete="off">
+
+            </div>
+
+
+            <div class="modal-acoes">
+
+                <button type="button" class="btn btn-secundario" id="btnCancelarEditarCategoria">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    Salvar alterações
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<!-- MODAL EXCLUIR CATEGORIA -->
+<div id="modalExcluirCategoria" class="modal-overlay">
+
+    <div class="modal-produto modal-exclusao">
+
+        <div class="modal-cabecalho">
+
+            <div>
+                <h2>Excluir categoria</h2>
+                <p>Esta ação não poderá ser desfeita.</p>
+            </div>
+
+            <button type="button" class="modal-fechar" id="btnFecharExcluirCategoria">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="modal-exclusao-conteudo">
+
+            <div class="modal-exclusao-icone">
+                🗑️
+            </div>
+
+            <div>
+
+                <h3>
+                    Tem certeza que deseja excluir esta categoria?
+                </h3>
+
+                <p>
+                    A categoria
+                    <strong id="nomeCategoriaExcluir"></strong>
+                    será removida.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-acoes">
+
+            <button type="button" class="btn btn-secundario" id="btnCancelarExcluirCategoria">
+                Cancelar
+            </button>
+
+            <button type="button" class="btn btn-perigo" id="btnConfirmarExcluirCategoria">
+                Excluir categoria
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

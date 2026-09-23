@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}
+Movimentações | EasyStock
+{% endblock %}
+
+{% block conteudo %}
+
+<!-- CABEÇALHO -->
+<div class="pagina-cabecalho">
+
+    <div>
+        <h1>Movimentações</h1>
+
+        <p>
+            Registre e acompanhe as entradas e saídas do estoque.
+        </p>
+    </div>
+
+
+    <div class="movimentacoes-cabecalho-acoes">
+
+        <button type="button" class="btn btn-entrada" id="btnRegistrarEntrada">
+            + Registrar entrada
+        </button>
+
+
+        <button type="button" class="btn btn-saida" id="btnRegistrarSaida">
+            ▣ Registrar saída
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- NOVA MOVIMENTAÇÃO -->
+<section class="card movimentacao-form-card">
+
+    <div class="movimentacao-card-cabecalho">
+        <h2>Nova movimentação</h2>
+    </div>
+
+
+    <form id="formMovimentacao">
+
+        <div class="movimentacao-form-grid">
+
+
+            <!-- PRODUTO -->
+            <div class="form-grupo">
+
+                <label for="movimentacaoProduto">
+                    Produto
+                </label>
+
+                <select id="movimentacaoProduto" required>
+                    <option value="">
+                        Selecione um produto
+                    </option>
+                </select>
+
+            </div>
+
+
+            <!-- TIPO -->
+            <div class="form-grupo">
+
+                <label for="movimentacaoTipo">
+                    Tipo de movimentação
+                </label>
+
+                <select id="movimentacaoTipo" required>
+
+                    <option value="adicionar">
+                        Entrada
+                    </option>
+
+                    <option value="remover">
+                        Saída
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- QUANTIDADE -->
+            <div class="form-grupo">
+
+                <label for="movimentacaoQuantidade">
+                    Quantidade
+                </label>
+
+                <input type="number" id="movimentacaoQuantidade" min="1" step="1" placeholder="0" required>
+
+            </div>
+
+
+            <!-- DATA -->
+            <div class="form-grupo">
+
+                <label for="movimentacaoData">
+                    Data
+                </label>
+
+                <input type="date" id="movimentacaoData">
+
+            </div>
+
+
+            <!-- OBSERVAÇÃO -->
+            <div class="form-grupo">
+
+                <label for="movimentacaoObservacao">
+                    Observação
+                </label>
+
+                <input type="text" id="movimentacaoObservacao" maxlength="200" placeholder="Ex.: Compra fornecedor">
+
+            </div>
+
+        </div>
+
+
+        <div class="movimentacao-form-rodape">
+
+            <div id="erroMovimentacao" class="movimentacao-erro"></div>
+
+
+            <button type="submit" class="btn btn-entrada">
+                Registrar movimentação
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+<!-- HISTÓRICO RECENTE -->
+<section class="card movimentacao-historico-card">
+
+    <div class="movimentacao-card-cabecalho historico-cabecalho">
+
+        <h2>Histórico recente</h2>
+
+        <a href="/historico">
+            Ver histórico completo
+        </a>
+
+    </div>
+
+
+    <div class="tabela-container">
+
+        <table class="tabela-movimentacoes">
+
+            <thead>
+                <tr>
+                    <th>DATA</th>
+                    <th>PRODUTO</th>
+                    <th>TIPO</th>
+                    <th>QUANTIDADE</th>
+                    <th>USUÁRIO</th>
+                </tr>
+            </thead>
+
+
+            <tbody id="tabelaMovimentacoesRecentes">
+
+                <!-- Carregado pelo JavaScript -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div id="semMovimentacoesRecentes" class="sem-produtos" style="display: none;">
+
+        <div>📋</div>
+
+        <h3>
+            Nenhuma movimentação registrada
+        </h3>
+
+        <p>
+            As entradas e saídas aparecerão aqui.
+        </p>
+
+    </div>
+
+</section>
+
+
+<div id="mensagem" class="mensagem"></div>
+
+{% endblock %}

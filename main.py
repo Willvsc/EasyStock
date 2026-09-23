@@ -104,11 +104,36 @@ def inicializar_banco():
         tipo TEXT NOT NULL,
         quantidade INTEGER NOT NULL,
         data_hora TEXT NOT NULL,
+        usuario_id INTEGER,
+
         FOREIGN KEY (produto_id)
             REFERENCES produtos(id)
+            ON DELETE SET NULL,
+
+        FOREIGN KEY (usuario_id)
+            REFERENCES usuario(id)
             ON DELETE SET NULL
     )
 """)
+    # ==============================
+# MIGRAÇÃO - USUÁRIO NAS MOVIMENTAÇÕES
+# ==============================
+
+    colunas_movimentacoes = conn.execute("""
+    PRAGMA table_info(movimentacoes)
+""").fetchall()
+
+    nomes_colunas_movimentacoes = [
+    coluna["name"]
+    for coluna in colunas_movimentacoes
+]
+
+    if "usuario_id" not in nomes_colunas_movimentacoes:
+
+        conn.execute("""
+        ALTER TABLE movimentacoes
+        ADD COLUMN usuario_id INTEGER
+    """)
 
     # ==============================
     # PERFIS PADRÃO
@@ -214,8 +239,300 @@ def pagina_inicial():
         "dashboard.html",
         pagina_ativa="dashboard"
     )
+@app.route("/produtos")
+def pagina_produtos():
 
+    if "usuario_id" not in session:
+        return redirect("/login")
 
+    return render_template(
+        "produtos.html",
+        pagina_ativa="produtos"
+    )
+
+@app.route("/categorias")
+def pagina_categorias():
+    if "usuario_id" not in session:
+        return redirect("/login")
+
+    return render_template(
+        "categorias.html",
+        pagina_ativa="categorias"
+    )
+
+@app.route("/movimentacoes")
+def pagina_movimentacoes():
+    if "usuario_id" not in session:
+        return redirect("/login")
+
+    return render_template(
+        "movimentacoes.html",
+        pagina_ativa="movimentacoes"
+    )
+@app.route("/historico")
+def pagina_historico():
+
+    if "usuario_id" not in session:
+        return redirect("/login")
+
+    return render_template(
+        "historico.html",
+        pagina_ativa="historico"
+    )
+@app.route("/usuarios")
+def pagina_usuarios():
+
+    if "usuario_id" not in session:
+        return redirect("/login")
+
+    if session.get("perfil") != "Administrador":
+        return redirect("/")
+
+    return render_template(
+        "usuarios.html",
+        pagina_ativa="usuarios"
+    )
+@app.route(
+    "/api/usuarios/<int:usuario_id>",
+    methods=["PUT"]
+)
+def editar_usuario(usuario_id):
+
+    if "usuario_id" not in session:
+        return jsonify({
+            "erro": "Usuário não autenticado."
+        }), 401
+
+    if session.get("perfil") != "Administrador":
+        return jsonify({
+            "erro": "Acesso permitido apenas para administradores."
+        }), 403
+
+    dados = request.get_json() or {}
+
+    nome = dados.get("nome", "").strip()
+    email = dados.get("email", "").strip().lower()
+    perfil_id = dados.get("perfil_id")
+
+    # ==============================
+    # VALIDAÇÕES
+    # ==============================
+
+    if not nome or not email or not perfil_id:
+        return jsonify({
+            "erro": "Nome, e-mail e perfil são obrigatórios."
+        }), 400
+
+    if len(nome) > 100:
+        return jsonify({
+            "erro":
+                "O nome do usuário deve ter no máximo 100 caracteres."
+        }), 400
+
+    padrao_email = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+
+    if not re.match(padrao_email, email):
+        return jsonify({
+            "erro": "Informe um endereço de e-mail válido."
+        }), 400
+
+    if len(email) > 150:
+        return jsonify({
+            "erro":
+                "O e-mail deve ter no máximo 150 caracteres."
+        }), 400
+
+    conn = conectar_banco()
+
+    # ==============================
+    # VERIFICAR USUÁRIO
+    # ==============================
+
+    usuario = conn.execute("""
+        SELECT id
+        FROM usuario
+        WHERE id = ?
+    """, (usuario_id,)).fetchone()
+
+    if not usuario:
+        conn.close()
+
+        return jsonify({
+            "erro": "Usuário não encontrado."
+        }), 404
+
+    # ==============================
+    # VERIFICAR PERFIL
+    # ==============================
+
+    perfil = conn.execute("""
+        SELECT id
+        FROM perfil
+        WHERE id = ?
+    """, (perfil_id,)).fetchone()
+
+    if not perfil:
+        conn.close()
+
+        return jsonify({
+            "erro": "Perfil não encontrado."
+        }), 404
+
+    # ==============================
+    # VERIFICAR E-MAIL DUPLICADO
+    # ==============================
+
+    email_existente = conn.execute("""
+        SELECT id
+        FROM usuario
+        WHERE email = ?
+          AND id != ?
+    """, (
+        email,
+        usuario_id
+    )).fetchone()
+
+    if email_existente:
+        conn.close()
+
+        return jsonify({
+            "erro":
+                "Já existe outro usuário com este e-mail."
+        }), 409
+
+    # ==============================
+    # ATUALIZAR
+    # ==============================
+
+    conn.execute("""
+        UPDATE usuario
+        SET
+            nome = ?,
+            email = ?,
+            perfil_id = ?
+        WHERE id = ?
+    """, (
+        nome,
+        email,
+        perfil_id,
+        usuario_id
+    ))
+
+    conn.commit()
+    conn.close()
+
+    # Se o administrador editou a própria conta,
+    # mantém os dados da sessão atualizados.
+    if session.get("usuario_id") == usuario_id:
+
+        session["usuario_nome"] = nome
+        session["usuario_email"] = email
+        session["perfil_id"] = perfil_id
+
+        conn = conectar_banco()
+
+        perfil_atualizado = conn.execute("""
+            SELECT nome
+            FROM perfil
+            WHERE id = ?
+        """, (perfil_id,)).fetchone()
+
+        conn.close()
+
+        if perfil_atualizado:
+            session["perfil"] = perfil_atualizado["nome"]
+
+    return jsonify({
+        "mensagem": "Usuário atualizado com sucesso."
+    }), 200
+
+@app.route(
+    "/api/usuarios/<int:usuario_id>",
+    methods=["DELETE"]
+)
+def excluir_usuario(usuario_id):
+
+    if "usuario_id" not in session:
+        return jsonify({
+            "erro": "Usuário não autenticado."
+        }), 401
+
+    if session.get("perfil") != "Administrador":
+        return jsonify({
+            "erro":
+                "Acesso permitido apenas para administradores."
+        }), 403
+
+    # Não permite excluir a própria conta
+    if session.get("usuario_id") == usuario_id:
+        return jsonify({
+            "erro":
+                "Você não pode excluir o usuário que está conectado."
+        }), 400
+
+    conn = conectar_banco()
+
+    # ==============================
+    # VERIFICAR USUÁRIO
+    # ==============================
+
+    usuario = conn.execute("""
+        SELECT
+            usuario.id,
+            usuario.nome,
+            usuario.perfil_id,
+            perfil.nome AS perfil
+        FROM usuario
+        INNER JOIN perfil
+            ON usuario.perfil_id = perfil.id
+        WHERE usuario.id = ?
+    """, (usuario_id,)).fetchone()
+
+    if not usuario:
+        conn.close()
+
+        return jsonify({
+            "erro": "Usuário não encontrado."
+        }), 404
+
+    # ==============================
+    # PROTEGER ÚLTIMO ADMINISTRADOR
+    # ==============================
+
+    if usuario["perfil"] == "Administrador":
+
+        total_administradores = conn.execute("""
+            SELECT COUNT(*) AS total
+            FROM usuario
+            INNER JOIN perfil
+                ON usuario.perfil_id = perfil.id
+            WHERE perfil.nome = 'Administrador'
+        """).fetchone()["total"]
+
+        if total_administradores <= 1:
+            conn.close()
+
+            return jsonify({
+                "erro":
+                    "Não é possível excluir o último administrador do sistema."
+            }), 400
+
+    # ==============================
+    # EXCLUIR USUÁRIO
+    # ==============================
+
+    conn.execute("""
+        DELETE FROM usuario
+        WHERE id = ?
+    """, (usuario_id,))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "mensagem":
+            "Usuário excluído com sucesso."
+    }), 200
 # ==============================
 # LISTAR PRODUTOS
 # ==============================
@@ -257,9 +574,22 @@ def listar_categorias():
     conn = conectar_banco()
 
     categorias = conn.execute("""
-        SELECT id, nome
+        SELECT
+            categorias.id,
+            categorias.nome,
+            COUNT(produtos.id) AS quantidade_produtos
+
         FROM categorias
-        ORDER BY nome ASC
+
+        LEFT JOIN produtos
+            ON produtos.categoria_id = categorias.id
+
+        GROUP BY
+            categorias.id,
+            categorias.nome
+
+        ORDER BY
+            categorias.nome ASC
     """).fetchall()
 
     conn.close()
@@ -556,15 +886,43 @@ def editar_produto(produto_id):
 )
 def alterar_quantidade(produto_id):
 
-    dados = request.get_json()
+    dados = request.get_json() or {}
 
     operacao = dados.get("operacao")
 
+    # Se nenhuma quantidade for informada,
+    # mantém o comportamento antigo de +1 / -1.
+    quantidade = dados.get("quantidade", 1)
+
+
+    # ==============================
+    # VALIDAR OPERAÇÃO
+    # ==============================
 
     if operacao not in ["adicionar", "remover"]:
 
         return jsonify({
             "erro": "Operação inválida."
+        }), 400
+
+
+    # ==============================
+    # VALIDAR QUANTIDADE
+    # ==============================
+
+    try:
+        quantidade = int(quantidade)
+    except (TypeError, ValueError):
+
+        return jsonify({
+            "erro": "Informe uma quantidade válida."
+        }), 400
+
+
+    if quantidade <= 0:
+
+        return jsonify({
+            "erro": "A quantidade deve ser maior que zero."
         }), 400
 
 
@@ -590,24 +948,38 @@ def alterar_quantidade(produto_id):
     quantidade_atual = produto["quantidade"]
 
 
+    # ==============================
+    # CALCULAR NOVO ESTOQUE
+    # ==============================
+
     if operacao == "adicionar":
 
-        nova_quantidade = quantidade_atual + 1
+        nova_quantidade = (
+            quantidade_atual + quantidade
+        )
+
         tipo_movimentacao = "entrada"
+
 
     else:
 
-        if quantidade_atual <= 0:
+        if quantidade > quantidade_atual:
 
             conn.close()
 
-        return jsonify({
-            "erro": "Não é possível realizar a saída. O produto está sem estoque."
-        }), 400
+            return jsonify({
+                "erro":
+                    "Não é possível realizar a saída. "
+                    "A quantidade informada é maior "
+                    "que o estoque disponível."
+            }), 400
 
-    nova_quantidade = quantidade_atual - 1
 
-    tipo_movimentacao = "saida"
+        nova_quantidade = (
+            quantidade_atual - quantidade
+        )
+
+        tipo_movimentacao = "saida"
 
 
     # ==============================
@@ -634,14 +1006,20 @@ def alterar_quantidade(produto_id):
         produto_nome,
         tipo,
         quantidade,
-        data_hora
+        data_hora,
+        usuario_id
     )
-    VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+    VALUES (
+        ?, ?, ?, ?,
+        datetime('now', 'localtime'),
+        ?
+    )
 """, (
     produto_id,
     produto["nome"],
     tipo_movimentacao,
-    1
+    quantidade,
+    session.get("usuario_id")
 ))
 
 
@@ -650,10 +1028,10 @@ def alterar_quantidade(produto_id):
 
 
     return jsonify({
-        "mensagem": "Quantidade atualizada!",
+        "mensagem":
+            "Movimentação registrada com sucesso!",
         "quantidade": nova_quantidade
     })
-
 
 # ==============================
 # EXCLUIR PRODUTO
@@ -875,14 +1253,31 @@ def listar_movimentacoes():
 
     movimentacoes = conn.execute("""
         SELECT
-            id,
-            produto_id,
-            produto_nome,
-            tipo,
-            quantidade,
-            data_hora
+            movimentacoes.id,
+            movimentacoes.produto_id,
+            movimentacoes.produto_nome,
+            movimentacoes.tipo,
+            movimentacoes.quantidade,
+            movimentacoes.data_hora,
+            movimentacoes.usuario_id,
+
+            usuario.nome AS usuario_nome,
+
+            categorias.id AS categoria_id,
+            categorias.nome AS categoria
+
         FROM movimentacoes
-        ORDER BY id DESC
+
+        LEFT JOIN usuario
+            ON usuario.id = movimentacoes.usuario_id
+
+        LEFT JOIN produtos
+            ON produtos.id = movimentacoes.produto_id
+
+        LEFT JOIN categorias
+            ON categorias.id = produtos.categoria_id
+
+        ORDER BY movimentacoes.id DESC
     """).fetchall()
 
     conn.close()
@@ -947,8 +1342,6 @@ def cadastrar_usuario():
             "erro": "A senha deve possuir pelo menos 6 caracteres."
         }), 400
 
-    conn = conectar_banco()
-    
     conn = conectar_banco()
 
     perfil = conn.execute("""

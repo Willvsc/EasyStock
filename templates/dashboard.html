@@ -137,35 +137,96 @@ Dashboard | EasyStock
 
         </div>
 
+<!-- GRÁFICO DE MOVIMENTAÇÕES -->
 
-        <div class="dashboard-movimentacoes-resumo">
+<div class="dashboard-grafico">
 
-            <div class="resumo-entrada">
-
-                <span>Entradas</span>
-
-                <strong id="totalEntradas">
-                    0
-                </strong>
-
-            </div>
+    <div id="graficoMovimentacoes" class="grafico-movimentacoes">
+        <!-- Barras carregadas pelo JavaScript -->
+    </div>
+    
+</div>
 
 
-            <div class="resumo-saida">
+    <div class="grafico-legenda">
 
-                <span>Saídas</span>
+        <div>
+            <span class="legenda-cor entrada"></span>
+            Entradas
+        </div>
 
-                <strong id="totalSaidas">
-                    0
-                </strong>
-
-            </div>
-
+        <div>
+            <span class="legenda-cor saida"></span>
+            Saídas
         </div>
 
     </div>
 
+</div>
 
+    <!-- RESUMO DO PERÍODO -->
+    
+    <div class="card dashboard-periodo">
+    
+        <div class="card-header">
+    
+            <div>
+                <h2>Resumo do período</h2>
+            </div>
+    
+        </div>
+    
+    
+        <div class="dashboard-periodo-conteudo">
+    
+            <!-- ENTRADAS -->
+    
+            <div class="periodo-card entrada">
+    
+                <div class="periodo-icone">
+                    ↑
+                </div>
+    
+                <span>
+                    Entradas
+                </span>
+    
+                <strong id="periodoTotalEntradas">
+                    0
+                </strong>
+    
+                <small id="periodoQuantidadeEntradas">
+                    0 movimentações
+                </small>
+    
+            </div>
+    
+    
+            <!-- SAÍDAS -->
+    
+            <div class="periodo-card saida">
+    
+                <div class="periodo-icone">
+                    ↓
+                </div>
+    
+                <span>
+                    Saídas
+                </span>
+    
+                <strong id="periodoTotalSaidas">
+                    0
+                </strong>
+    
+                <small id="periodoQuantidadeSaidas">
+                    0 movimentações
+                </small>
+    
+            </div>
+    
+        </div>
+    
+    </div>
     <div class="card dashboard-baixo">
 
         <div class="card-header">

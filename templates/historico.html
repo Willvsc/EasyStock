@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}
+Histórico | EasyStock
+{% endblock %}
+
+
+{% block conteudo %}
+
+<!-- =========================================================
+     CABEÇALHO
+     ========================================================= -->
+
+<div class="pagina-cabecalho">
+
+    <div>
+        <h1>Histórico de movimentações</h1>
+
+        <p>
+            Consulte todas as alterações realizadas no estoque.
+        </p>
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     FILTROS
+     ========================================================= -->
+
+<section class="card historico-filtros-card">
+
+    <div class="historico-filtros">
+
+        <!-- PESQUISA -->
+        <div class="form-grupo">
+
+            <label for="filtroProduto">
+                Pesquisar
+            </label>
+
+            <input type="text" id="filtroProduto" placeholder="Pesquisar produto..." autocomplete="off">
+
+        </div>
+
+
+        <!-- PRODUTO -->
+        <div class="form-grupo">
+
+            <label for="filtroProdutoSelect">
+                Produto
+            </label>
+
+            <select id="filtroProdutoSelect">
+
+                <option value="todos">
+                    Todos os produtos
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- CATEGORIA -->
+        <div class="form-grupo">
+
+            <label for="filtroCategoriaHistorico">
+                Categoria
+            </label>
+
+            <select id="filtroCategoriaHistorico">
+
+                <option value="todas">
+                    Todas as categorias
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- TIPO -->
+        <div class="form-grupo">
+
+            <label for="filtroTipo">
+                Tipo
+            </label>
+
+            <select id="filtroTipo">
+
+                <option value="todos">
+                    Entrada e saída
+                </option>
+
+                <option value="entrada">
+                    Entrada
+                </option>
+
+                <option value="saida">
+                    Saída
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- DATA -->
+        <div class="form-grupo">
+
+            <label for="filtroData">
+                Data
+            </label>
+
+            <input type="date" id="filtroData">
+
+        </div>
+
+
+        <!-- LIMPAR FILTROS -->
+        <div class="historico-filtro-acao">
+
+            <button type="button" class="btn btn-secundario" id="btnLimparFiltros">
+                Limpar filtros
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     TABELA DE MOVIMENTAÇÕES
+     ========================================================= -->
+
+<section class="card historico-card">
+
+    <div class="historico-card-cabecalho">
+
+        <div>
+
+            <h2>
+                Movimentações do estoque
+            </h2>
+
+            <p>
+                Histórico completo das operações realizadas.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="tabela-container">
+
+        <table class="tabela-movimentacoes">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        PRODUTO
+                    </th>
+
+                    <th>
+                        CATEGORIA
+                    </th>
+
+                    <th>
+                        TIPO
+                    </th>
+
+                    <th>
+                        QUANTIDADE
+                    </th>
+
+                    <th>
+                        DATA E HORA
+                    </th>
+
+                    <th>
+                        USUÁRIO
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tabelaMovimentacoes">
+
+                <!-- Movimentações carregadas pelo JavaScript -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =====================================================
+         ESTADO VAZIO
+         ===================================================== -->
+
+    <div id="semMovimentacoes" class="sem-produtos" style="display: none;">
+
+        <div>
+            📋
+        </div>
+
+        <h3>
+            Nenhuma movimentação encontrada
+        </h3>
+
+        <p>
+            As entradas e saídas realizadas aparecerão aqui.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     MENSAGENS
+     ========================================================= -->
+
+<div id="mensagem" class="mensagem"></div>
+
+
+{% endblock %}
