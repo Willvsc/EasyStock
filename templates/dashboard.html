@@ -7,12 +7,57 @@ Dashboard | EasyStock
 
 {% block conteudo %}
 
-<div class="pagina-cabecalho">
+<!-- ==============================
+     CABEÇALHO
+     ============================== -->
 
-    <div>
-        <h1>Dashboard</h1>
-        <p>Visão geral do seu estoque</p>
+<div class="pagina-cabecalho dashboard-cabecalho">
+
+    <div class="dashboard-titulo-area">
+
+        <div class="dashboard-titulo">
+
+            <h1>
+                Dashboard
+            </h1>
+
+            <p>
+                Visão geral do seu estoque
+            </p>
+
+        </div>
+
+
+        <!-- VALOR DO ESTOQUE
+             SOMENTE ADMINISTRADOR -->
+
+        {% if session.get("perfil") == "Administrador" %}
+
+        <div class="dashboard-valor-estoque">
+
+            <div class="dashboard-valor-conteudo">
+
+                <span>
+                    Valor em estoque
+                </span>
+
+                <strong id="valorEstoque">
+                    R$ 0,00
+                </strong>
+
+            </div>
+
+
+            <div class="dashboard-valor-icone">
+                R$
+            </div>
+
+        </div>
+
+        {% endif %}
+
     </div>
+
 
     <a href="/movimentacoes" class="btn btn-primary">
         + Nova movimentação
@@ -21,13 +66,19 @@ Dashboard | EasyStock
 </div>
 
 
-<!-- INDICADORES -->
+<!-- ==============================
+     INDICADORES
+     ============================== -->
 
 <section class="dashboard-resumo">
+
+
+    <!-- TOTAL DE PRODUTOS -->
 
     <div class="dashboard-card">
 
         <div>
+
             <span class="dashboard-label">
                 Total de produtos
             </span>
@@ -39,7 +90,9 @@ Dashboard | EasyStock
             <small>
                 Produtos cadastrados
             </small>
+
         </div>
+
 
         <div class="dashboard-icone">
             📦
@@ -48,9 +101,12 @@ Dashboard | EasyStock
     </div>
 
 
+    <!-- ITENS EM ESTOQUE -->
+
     <div class="dashboard-card">
 
         <div>
+
             <span class="dashboard-label">
                 Itens em estoque
             </span>
@@ -62,7 +118,9 @@ Dashboard | EasyStock
             <small>
                 Em todas as categorias
             </small>
+
         </div>
+
 
         <div class="dashboard-icone">
             ◇
@@ -71,9 +129,12 @@ Dashboard | EasyStock
     </div>
 
 
+    <!-- ESTOQUE BAIXO -->
+
     <div class="dashboard-card">
 
         <div>
+
             <span class="dashboard-label">
                 Estoque baixo
             </span>
@@ -85,7 +146,9 @@ Dashboard | EasyStock
             <small>
                 Precisam de atenção
             </small>
+
         </div>
+
 
         <div class="dashboard-icone">
             ⚠
@@ -94,9 +157,12 @@ Dashboard | EasyStock
     </div>
 
 
+    <!-- MOVIMENTAÇÕES -->
+
     <div class="dashboard-card">
 
         <div>
+
             <span class="dashboard-label">
                 Movimentações
             </span>
@@ -108,7 +174,9 @@ Dashboard | EasyStock
             <small>
                 Registros realizados
             </small>
+
         </div>
+
 
         <div class="dashboard-icone">
             ↻
@@ -119,138 +187,285 @@ Dashboard | EasyStock
 </section>
 
 
-<!-- CONTEÚDO INFERIOR -->
+<!-- ==============================
+     CONTEÚDO PRINCIPAL
+     ============================== -->
 
 <section class="dashboard-grid">
 
-    <div class="card dashboard-movimentacoes">
 
-        <div class="card-header">
+    <!-- ==============================
+         COLUNA ESQUERDA
+         ============================== -->
 
-            <div>
-                <h2>Movimentações de estoque</h2>
-
-                <p>
-                    Entradas e saídas registradas no estoque
-                </p>
-            </div>
-
-        </div>
-
-<!-- GRÁFICO DE MOVIMENTAÇÕES -->
-
-<div class="dashboard-grafico">
-
-    <div id="graficoMovimentacoes" class="grafico-movimentacoes">
-        <!-- Barras carregadas pelo JavaScript -->
-    </div>
-    
-</div>
+    <div class="dashboard-coluna-graficos">
 
 
-    <div class="grafico-legenda">
+        <!-- ==============================
+             MOVIMENTAÇÕES DE ESTOQUE
+             ============================== -->
 
-        <div>
-            <span class="legenda-cor entrada"></span>
-            Entradas
-        </div>
+        <div class="card dashboard-movimentacoes">
 
-        <div>
-            <span class="legenda-cor saida"></span>
-            Saídas
-        </div>
+            <div class="card-header">
 
-    </div>
+                <div>
 
-</div>
+                    <h2>
+                        Movimentações de estoque
+                    </h2>
 
-    <!-- RESUMO DO PERÍODO -->
-    
-    <div class="card dashboard-periodo">
-    
-        <div class="card-header">
-    
-            <div>
-                <h2>Resumo do período</h2>
-            </div>
-    
-        </div>
-    
-    
-        <div class="dashboard-periodo-conteudo">
-    
-            <!-- ENTRADAS -->
-    
-            <div class="periodo-card entrada">
-    
-                <div class="periodo-icone">
-                    ↑
+                    <p>
+                        Entradas e saídas registradas no estoque
+                    </p>
+
                 </div>
-    
-                <span>
+
+            </div>
+
+
+            <!-- GRÁFICO -->
+
+            <div class="dashboard-grafico">
+
+                <div id="graficoMovimentacoes" class="grafico-movimentacoes">
+                    <!-- Barras carregadas pelo JavaScript -->
+                </div>
+
+            </div>
+
+
+            <!-- LEGENDA -->
+
+            <div class="grafico-legenda">
+
+                <div>
+
+                    <span class="legenda-cor entrada"></span>
+
                     Entradas
-                </span>
-    
-                <strong id="periodoTotalEntradas">
-                    0
-                </strong>
-    
-                <small id="periodoQuantidadeEntradas">
-                    0 movimentações
-                </small>
-    
-            </div>
-    
-    
-            <!-- SAÍDAS -->
-    
-            <div class="periodo-card saida">
-    
-                <div class="periodo-icone">
-                    ↓
+
                 </div>
-    
-                <span>
+
+
+                <div>
+
+                    <span class="legenda-cor saida"></span>
+
                     Saídas
-                </span>
-    
-                <strong id="periodoTotalSaidas">
-                    0
-                </strong>
-    
-                <small id="periodoQuantidadeSaidas">
-                    0 movimentações
-                </small>
-    
+
+                </div>
+
             </div>
-    
+
         </div>
-    
+
+
+        <!-- ==============================
+             MOVIMENTAÇÕES FINANCEIRAS
+             SOMENTE ADMINISTRADOR
+             ============================== -->
+
+        {% if session.get("perfil") == "Administrador" %}
+
+        <div class="card dashboard-financeiro-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        Movimentações financeiras
+                    </h2>
+
+                    <p>
+                        Valores de entradas e saídas nos últimos 7 dias
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- GRÁFICO FINANCEIRO -->
+
+            <div class="dashboard-grafico-financeiro">
+
+                <div id="graficoFinanceiro" class="grafico-financeiro">
+                    <!-- Barras carregadas pelo JavaScript -->
+                </div>
+
+            </div>
+
+
+            <!-- LEGENDA -->
+
+            <div class="grafico-legenda">
+
+                <div>
+
+                    <span class="legenda-cor entrada"></span>
+
+                    Entradas
+
+                </div>
+
+
+                <div>
+
+                    <span class="legenda-cor saida"></span>
+
+                    Saídas
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
     </div>
-    <div class="card dashboard-baixo">
 
-        <div class="card-header">
 
-            <div>
-                <h2>Estoque baixo</h2>
+    <!-- ==============================
+         COLUNA DIREITA
+         ============================== -->
 
-                <p>
-                    Produtos que precisam de atenção
-                </p>
+    <div class="dashboard-coluna-lateral">
+
+
+        <!-- ==============================
+             RESUMO DO PERÍODO
+             ============================== -->
+
+        <div class="card dashboard-periodo">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        Resumo do período
+                    </h2>
+
+                </div>
+
             </div>
 
-            <a href="/produtos">
-                Ver todos
-            </a>
+
+            <div class="dashboard-periodo-conteudo">
+
+
+                <!-- ENTRADAS -->
+
+                <div class="periodo-card entrada">
+
+                    <div class="periodo-icone">
+                        ↑
+                    </div>
+
+
+                    <span>
+                        Entradas
+                    </span>
+
+
+                    <strong id="periodoTotalEntradas">
+                        0
+                    </strong>
+
+
+                    <small id="periodoQuantidadeEntradas">
+                        0 movimentações
+                    </small>
+
+
+                    {% if session.get("perfil") == "Administrador" %}
+
+                    <small id="valorFinanceiroEntradas" class="periodo-valor-financeiro">
+                        R$ 0,00
+                    </small>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- SAÍDAS -->
+
+                <div class="periodo-card saida">
+
+                    <div class="periodo-icone">
+                        ↓
+                    </div>
+
+
+                    <span>
+                        Saídas
+                    </span>
+
+
+                    <strong id="periodoTotalSaidas">
+                        0
+                    </strong>
+
+
+                    <small id="periodoQuantidadeSaidas">
+                        0 movimentações
+                    </small>
+
+
+                    {% if session.get("perfil") == "Administrador" %}
+
+                    <small id="valorFinanceiroSaidas" class="periodo-valor-financeiro">
+                        R$ 0,00
+                    </small>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
 
         </div>
 
 
-        <div id="listaEstoqueBaixo">
+        <!-- ==============================
+             ESTOQUE BAIXO
+             ============================== -->
 
-            <p class="dashboard-vazio">
-                Nenhum produto com estoque baixo.
-            </p>
+        <div class="card dashboard-baixo">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        Estoque baixo
+                    </h2>
+
+                    <p>
+                        Produtos que precisam de atenção
+                    </p>
+
+                </div>
+
+
+                <a href="/produtos">
+                    Ver todos
+                </a>
+
+            </div>
+
+
+            <div id="listaEstoqueBaixo">
+
+                <p class="dashboard-vazio">
+                    Nenhum produto com estoque baixo.
+                </p>
+
+            </div>
 
         </div>
 

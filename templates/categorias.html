@@ -5,6 +5,9 @@ Categorias | EasyStock
 {% endblock %}
 
 {% block conteudo %}
+<script>
+    window.perfilUsuario = "{{ session.get('perfil', '') }}";
+</script>
 
 <div class="pagina-cabecalho">
 
@@ -15,9 +18,13 @@ Categorias | EasyStock
         </p>
     </div>
 
+    {% if session.get("perfil") in ["Administrador", "Gerente"] %}
+    
     <button type="button" class="btn btn-primary" id="btnNovaCategoria">
         + Nova categoria
     </button>
+    
+    {% endif %}
 
 </div>
 

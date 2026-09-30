@@ -6,6 +6,9 @@ Produtos | EasyStock
 
 {% block conteudo %}
 
+<script>
+    window.perfilUsuario = "{{ session.get('perfil', '') }}";
+</script>
 <!-- CABEÇALHO -->
 
 <div class="pagina-cabecalho">
@@ -17,9 +20,13 @@ Produtos | EasyStock
         </p>
     </div>
 
-    <button type="button" class="btn btn-primary" id="btnNovoProduto">
-        + Novo produto
-    </button>
+{% if session.get("perfil") in ["Administrador", "Gerente"] %}
+
+<button type="button" class="btn btn-primary" id="btnNovoProduto">
+    + Novo produto
+</button>
+
+{% endif %}
 
 </div>
 

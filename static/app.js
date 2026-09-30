@@ -133,73 +133,162 @@ function carregarFiltroCategoriasProdutos() {
 
 function renderizarProdutos() {
 
-    const termo =
-        pesquisa.value
-            .toLowerCase()
-            .trim();
+    // ==============================
+    // ELEMENTOS DA PÁGINA
+    // ==============================
 
-    semProdutos.style.display = "none";
+    const campoPesquisa =
+        document.getElementById(
+            "pesquisa"
+        );
+
+    const tabelaProdutos =
+        document.getElementById(
+            "tabelaProdutos"
+        );
+
+    const contadorProdutos =
+        document.getElementById(
+            "contador"
+        );
+
+    const semProdutosElemento =
+        document.getElementById(
+            "semProdutos"
+        );
 
     const filtroCategoria =
-    document.getElementById(
-        "filtroCategoriaProdutos"
-    );
+        document.getElementById(
+            "filtroCategoriaProdutos"
+        );
 
-const categoriaSelecionada =
-    filtroCategoria
-        ? filtroCategoria.value
-        : "";
+
+    // ==============================
+    // VERIFICAR PÁGINA
+    // ==============================
+
+    if (!tabelaProdutos) {
+        return;
+    }
+
+
+    // ==============================
+    // TERMO DA PESQUISA
+    // ==============================
+
+    const termo =
+        campoPesquisa
+            ? campoPesquisa.value
+                .toLowerCase()
+                .trim()
+            : "";
+
+
+    // ==============================
+    // CATEGORIA SELECIONADA
+    // ==============================
+
+    const categoriaSelecionada =
+        filtroCategoria
+            ? filtroCategoria.value
+            : "";
+
+
+    // ==============================
+    // FILTRAR PRODUTOS
+    // ==============================
 
     const produtosFiltrados =
         produtos.filter(produto => {
 
-           const correspondePesquisa =
-    produto.nome
-        .toLowerCase()
-        .includes(termo) ||
-
-    produto.sku
-        .toLowerCase()
-        .includes(termo);
+            const nome =
+                String(
+                    produto.nome || ""
+                ).toLowerCase();
 
 
-const correspondeCategoria =
-    categoriaSelecionada === "" ||
-    produto.categoria === categoriaSelecionada;
+            const sku =
+                String(
+                    produto.sku || ""
+                ).toLowerCase();
 
 
-return (
-    correspondePesquisa &&
-    correspondeCategoria
-);
+            const correspondePesquisa =
+                nome.includes(termo) ||
+                sku.includes(termo);
+
+
+            const correspondeCategoria =
+                categoriaSelecionada === "" ||
+                produto.categoria ===
+                    categoriaSelecionada;
+
+
+            return (
+                correspondePesquisa &&
+                correspondeCategoria
+            );
 
         });
 
 
-    tabela.innerHTML = "";
+    // ==============================
+    // LIMPAR TABELA
+    // ==============================
+
+    tabelaProdutos.innerHTML = "";
 
 
-    contador.textContent =
-        `${produtos.length} produto${produtos.length !== 1 ? "s" : ""} cadastrado${produtos.length !== 1 ? "s" : ""}`;
+    // ==============================
+    // CONTADOR
+    // ==============================
 
+    if (contadorProdutos) {
+
+        contadorProdutos.textContent =
+            `${produtos.length} ` +
+            `produto${produtos.length !== 1 ? "s" : ""} ` +
+            `cadastrado${produtos.length !== 1 ? "s" : ""}`;
+
+    }
+
+
+    // ==============================
+    // NENHUM PRODUTO
+    // ==============================
 
     if (produtosFiltrados.length === 0) {
 
-        semProdutos.style.display = "block";
+        if (semProdutosElemento) {
+
+            semProdutosElemento.style.display =
+                "block";
+
+        }
 
         return;
 
     }
 
 
-    semProdutos.style.display = "none";
+    // Existem produtos para mostrar.
 
+    if (semProdutosElemento) {
+
+        semProdutosElemento.style.display =
+            "none";
+
+    }
+
+
+    // ==============================
+    // RENDERIZAR PRODUTOS
+    // ==============================
 
     produtosFiltrados.forEach(produto => {
 
         const linha =
             document.createElement("tr");
-
 
         // ==============================
         // STATUS DO ESTOQUE
@@ -293,30 +382,37 @@ return (
 
 <td>
 
-    <button
-        type="button"
-        class="btn-editar"
-        onclick="abrirEdicao(${produto.id})"
-        title="Editar produto"
-    >
-        ✏️
-    </button>
+    ${
+    window.perfilUsuario === "Administrador" ||
+    window.perfilUsuario === "Gerente"
+        ? `
+            <button
+                type="button"
+                class="btn-editar"
+                onclick="abrirEdicao(${produto.id})"
+                title="Editar produto"
+            >
+                ✏️
+            </button>
 
-    <button
-        type="button"
-        class="btn-excluir"
-        onclick="excluirProduto(${produto.id})"
-        title="Excluir produto"
-    >
-        🗑️
-    </button>
+            <button
+                type="button"
+                class="btn-excluir"
+                onclick="excluirProduto(${produto.id})"
+                title="Excluir produto"
+            >
+                🗑️
+            </button>
+        `
+        : ""
+}
 
 </td>
 
 `;
 
 
-        tabela.appendChild(linha);
+        tabelaProdutos.appendChild(linha);
 
     });
 
@@ -1020,23 +1116,30 @@ async function carregarCategorias() {
 
             <div class="categoria-acoes">
 
-                <button
-                    type="button"
-                    class="btn-editar"
-                    onclick="abrirEdicaoCategoria(${categoria.id})"
-                    title="Editar categoria"
-                >
-                    ✏️
-                </button>
+                ${
+    window.perfilUsuario === "Administrador" ||
+    window.perfilUsuario === "Gerente"
+        ? `
+            <button
+                type="button"
+                class="btn-editar"
+                onclick="abrirEdicaoCategoria(${categoria.id})"
+                title="Editar categoria"
+            >
+                ✏️
+            </button>
 
-                <button
-                    type="button"
-                    class="btn-excluir"
-                    onclick="excluirCategoria(${categoria.id})"
-                    title="Excluir categoria"
-                >
-                    🗑️
-                </button>
+            <button
+                type="button"
+                class="btn-excluir"
+                onclick="excluirCategoria(${categoria.id})"
+                title="Excluir categoria"
+            >
+                🗑️
+            </button>
+        `
+        : ""
+}
 
             </div>
 
@@ -2250,48 +2353,239 @@ if (btnLimparFiltros) {
     );
 
 }
-
 // ==============================
-// INICIALIZAÇÃO
+// RELATÓRIO MENSAL DO HISTÓRICO
+// SOMENTE ADMINISTRADOR
+// ==============================
+
+const relatorioMes =
+    document.getElementById(
+        "relatorioMes"
+    );
+
+const relatorioAno =
+    document.getElementById(
+        "relatorioAno"
+    );
+
+const btnExportarRelatorio =
+    document.getElementById(
+        "btnExportarRelatorio"
+    );
+
+
+if (
+    relatorioMes &&
+    relatorioAno &&
+    btnExportarRelatorio
+) {
+
+    // ==============================
+    // PERÍODO ATUAL
+    // ==============================
+
+    const dataAtual =
+        new Date();
+
+    const mesAtual =
+        dataAtual.getMonth() + 1;
+
+    const anoAtual =
+        dataAtual.getFullYear();
+
+
+    // Selecionar mês atual
+
+    relatorioMes.value =
+        String(mesAtual);
+
+
+    // ==============================
+    // PREENCHER ANOS
+    // ==============================
+
+    relatorioAno.innerHTML = "";
+
+
+    /*
+     * Começamos em 2026 porque é o
+     * período de desenvolvimento do
+     * EasyStock.
+     *
+     * Nos próximos anos, o sistema
+     * adicionará os anos automaticamente.
+     */
+
+    for (
+        let ano = anoAtual;
+        ano >= 2026;
+        ano--
+    ) {
+
+        const opcao =
+            document.createElement(
+                "option"
+            );
+
+        opcao.value =
+            String(ano);
+
+        opcao.textContent =
+            String(ano);
+
+
+        if (ano === anoAtual) {
+
+            opcao.selected =
+                true;
+
+        }
+
+
+        relatorioAno.appendChild(
+            opcao
+        );
+
+    }
+
+
+    // ==============================
+    // BOTÃO EXPORTAR
+    // ==============================
+
+    btnExportarRelatorio.addEventListener(
+    "click",
+    () => {
+
+        const mes =
+            Number(
+                relatorioMes.value
+            );
+
+        const ano =
+            Number(
+                relatorioAno.value
+            );
+
+
+        if (
+            !mes ||
+            !ano
+        ) {
+
+            alert(
+                "Selecione um mês e um ano válidos."
+            );
+
+            return;
+        }
+
+
+        // ==============================
+        // ROTA DO PDF
+        // ==============================
+
+        const url =
+            "/api/relatorios/" +
+            "movimentacoes/pdf" +
+            `?mes=${mes}&ano=${ano}`;
+
+
+        // ==============================
+        // INICIAR DOWNLOAD
+        // ==============================
+
+        window.location.href =
+            url;
+
+    }
+);
+}
+// ==============================
+// INICIALIZAÇÃO DO SISTEMA
 // ==============================
 
 window.addEventListener(
     "load",
-    () => {
-
-        // ==============================
-        // PÁGINA DE PRODUTOS
-        // ==============================
-
-        if (
-            document.getElementById("produtoForm") ||
-            document.getElementById("tabelaProdutos")
-        ) {
-
-            carregarProdutos();
-
-        }
-
-
-        // ==============================
-        // PÁGINA DE HISTÓRICO
-        // ==============================
-
-        if (
-            document.getElementById("tabelaMovimentacoes") &&
-            document.getElementById("filtroProduto")
-        ) {
-
-            carregarMovimentacoes();
-
-        }
-
+    async () => {
 
         // ==============================
         // SESSÃO
         // ==============================
 
-        verificarSessao();
+        try {
+
+            await verificarSessao();
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao verificar sessão:",
+                erro
+            );
+
+        }
+
+
+        // ==============================
+        // DASHBOARD
+        // ==============================
+
+        if (
+            document.getElementById(
+                "totalProdutos"
+            )
+        ) {
+
+            await carregarNovoDashboard();
+
+        }
+
+
+        // ==============================
+        // PRODUTOS
+        // ==============================
+
+        if (
+            document.getElementById(
+                "tabelaProdutos"
+            )
+        ) {
+
+            await carregarProdutos();
+
+        }
+
+
+        // ==============================
+        // MOVIMENTAÇÕES / HISTÓRICO
+        // ==============================
+
+        if (
+            document.getElementById(
+                "tabelaMovimentacoes"
+            )
+        ) {
+
+            await carregarMovimentacoes();
+
+        }
+
+
+        // ==============================
+        // USUÁRIOS
+        // ==============================
+
+        if (
+            document.getElementById(
+                "tabelaUsuarios"
+            )
+        ) {
+
+            await carregarUsuarios();
+            await carregarPerfisUsuarios();
+
+        }
 
     }
 );
@@ -2446,80 +2740,6 @@ if (formUsuario) {
     );
 
 }
-async function carregarUsuarios() {
-
-    const tabelaUsuarios =
-        document.getElementById("tabelaUsuarios");
-
-    if (!tabelaUsuarios) {
-        return;
-    }
-
-    try {
-
-        const resposta =
-            await fetch("/api/usuarios");
-
-        if (!resposta.ok) {
-            throw new Error(
-                "Não foi possível carregar os usuários."
-            );
-        }
-
-        const usuarios =
-            await resposta.json();
-
-
-        tabelaUsuarios.innerHTML = "";
-
-
-        usuarios.forEach(
-            function (usuario) {
-
-                const linha =
-                    document.createElement("tr");
-
-
-                const colunaNome =
-                    document.createElement("td");
-
-                colunaNome.textContent =
-                    usuario.nome;
-
-
-                const colunaEmail =
-                    document.createElement("td");
-
-                colunaEmail.textContent =
-                    usuario.email;
-
-
-                const colunaPerfil =
-                    document.createElement("td");
-
-                colunaPerfil.textContent =
-                    usuario.perfil;
-
-
-                linha.appendChild(colunaNome);
-                linha.appendChild(colunaEmail);
-                linha.appendChild(colunaPerfil);
-
-                tabelaUsuarios.appendChild(linha);
-
-            }
-        );
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao carregar usuários:",
-            erro
-        );
-
-    }
-
-}
 async function verificarSessao() {
 
     const secaoUsuarios =
@@ -2572,13 +2792,16 @@ async function verificarSessao() {
 async function carregarNovoDashboard() {
 
     // Executa somente se estivermos
-    // na nova página de Dashboard.
+    // na página de Dashboard.
     const totalProdutosElemento =
-        document.getElementById("totalProdutos");
+        document.getElementById(
+            "totalProdutos"
+        );
 
     if (!totalProdutosElemento) {
         return;
     }
+
 
     try {
 
@@ -2587,44 +2810,92 @@ async function carregarNovoDashboard() {
         // ==============================
 
         const respostaProdutos =
-            await fetch("/api/produtos");
+            await fetch(
+                "/api/produtos"
+            );
+
 
         if (!respostaProdutos.ok) {
+
             throw new Error(
                 "Não foi possível carregar os produtos."
             );
+
         }
+
 
         const produtos =
             await respostaProdutos.json();
 
 
+        // ==============================
+        // INDICADORES DE PRODUTOS
+        // ==============================
+
         const totalProdutos =
             produtos.length;
+
 
         const totalItens =
             produtos.reduce(
                 (total, produto) =>
-                    total + Number(produto.quantidade || 0),
+                    total +
+                    Number(
+                        produto.quantidade || 0
+                    ),
                 0
             );
+
+
+        const valorTotalEstoque =
+            produtos.reduce(
+                (total, produto) => {
+
+                    const preco =
+                        Number(
+                            produto.preco || 0
+                        );
+
+                    const quantidade =
+                        Number(
+                            produto.quantidade || 0
+                        );
+
+                    return total + (
+                        preco * quantidade
+                    );
+
+                },
+                0
+            );
+
 
         const produtosEstoqueBaixo =
             produtos.filter(
                 produto =>
-                    Number(produto.quantidade) > 0 &&
-                    Number(produto.quantidade) <= 5
+                    Number(
+                        produto.quantidade
+                    ) > 0 &&
+                    Number(
+                        produto.quantidade
+                    ) <= 5
             );
 
 
+        // ==============================
+        // ATUALIZAR INDICADORES
+        // ==============================
+
         document.getElementById(
             "totalProdutos"
-        ).textContent = totalProdutos;
+        ).textContent =
+            totalProdutos;
 
 
         document.getElementById(
             "totalItens"
-        ).textContent = totalItens;
+        ).textContent =
+            totalItens;
 
 
         document.getElementById(
@@ -2634,17 +2905,48 @@ async function carregarNovoDashboard() {
 
 
         // ==============================
+        // VALOR TOTAL DO ESTOQUE
+        // SOMENTE ADMINISTRADOR
+        // ==============================
+
+        const valorEstoqueElemento =
+            document.getElementById(
+                "valorEstoque"
+            );
+
+
+        if (valorEstoqueElemento) {
+
+            valorEstoqueElemento.textContent =
+                valorTotalEstoque.toLocaleString(
+                    "pt-BR",
+                    {
+                        style: "currency",
+                        currency: "BRL"
+                    }
+                );
+
+        }
+
+
+        // ==============================
         // MOVIMENTAÇÕES
         // ==============================
 
         const respostaMovimentacoes =
-            await fetch("/api/movimentacoes");
+            await fetch(
+                "/api/movimentacoes"
+            );
+
 
         if (!respostaMovimentacoes.ok) {
+
             throw new Error(
                 "Não foi possível carregar as movimentações."
             );
+
         }
+
 
         const movimentacoes =
             await respostaMovimentacoes.json();
@@ -2653,20 +2955,118 @@ async function carregarNovoDashboard() {
         const entradas =
             movimentacoes.filter(
                 movimentacao =>
-                    movimentacao.tipo === "entrada"
+                    movimentacao.tipo ===
+                    "entrada"
             );
+
 
         const saidas =
             movimentacoes.filter(
                 movimentacao =>
-                    movimentacao.tipo === "saida"
+                    movimentacao.tipo ===
+                    "saida"
             );
 
 
-        document.getElementById(
-            "totalMovimentacoes"
-        ).textContent =
-            movimentacoes.length;
+        // ==============================
+        // TOTAL DE MOVIMENTAÇÕES
+        // ==============================
+
+        const totalMovimentacoesElemento =
+            document.getElementById(
+                "totalMovimentacoes"
+            );
+
+
+        if (totalMovimentacoesElemento) {
+
+            totalMovimentacoesElemento.textContent =
+                movimentacoes.length;
+
+        }
+
+
+        // ==============================
+        // RESUMO DO PERÍODO
+        // ==============================
+
+        const totalQuantidadeEntradas =
+            entradas.reduce(
+                (total, movimentacao) =>
+                    total +
+                    Number(
+                        movimentacao.quantidade || 0
+                    ),
+                0
+            );
+
+
+        const totalQuantidadeSaidas =
+            saidas.reduce(
+                (total, movimentacao) =>
+                    total +
+                    Number(
+                        movimentacao.quantidade || 0
+                    ),
+                0
+            );
+
+
+        const periodoTotalEntradas =
+            document.getElementById(
+                "periodoTotalEntradas"
+            );
+
+
+        const periodoTotalSaidas =
+            document.getElementById(
+                "periodoTotalSaidas"
+            );
+
+
+        const periodoQuantidadeEntradas =
+            document.getElementById(
+                "periodoQuantidadeEntradas"
+            );
+
+
+        const periodoQuantidadeSaidas =
+            document.getElementById(
+                "periodoQuantidadeSaidas"
+            );
+
+
+        if (periodoTotalEntradas) {
+
+            periodoTotalEntradas.textContent =
+                totalQuantidadeEntradas;
+
+        }
+
+
+        if (periodoTotalSaidas) {
+
+            periodoTotalSaidas.textContent =
+                totalQuantidadeSaidas;
+
+        }
+
+
+        if (periodoQuantidadeEntradas) {
+
+            periodoQuantidadeEntradas.textContent =
+                `${entradas.length} movimentações`;
+
+        }
+
+
+        if (periodoQuantidadeSaidas) {
+
+            periodoQuantidadeSaidas.textContent =
+                `${saidas.length} movimentações`;
+
+        }
+
 
         // ==============================
         // LISTA DE ESTOQUE BAIXO
@@ -2677,48 +3077,319 @@ async function carregarNovoDashboard() {
                 "listaEstoqueBaixo"
             );
 
-        if (!lista) {
-            return;
+
+        if (lista) {
+
+            if (
+                produtosEstoqueBaixo.length ===
+                0
+            ) {
+
+                lista.innerHTML = `
+                    <p class="dashboard-vazio">
+                        Nenhum produto com estoque baixo.
+                    </p>
+                `;
+
+            } else {
+
+                lista.innerHTML =
+                    produtosEstoqueBaixo
+                        .slice(0, 5)
+                        .map(
+                            produto => `
+                                <div class="dashboard-produto-baixo">
+
+                                    <div>
+
+                                        <strong>
+                                            ${produto.nome}
+                                        </strong>
+
+                                        <span>
+                                            ${produto.sku}
+                                            ·
+                                            ${produto.categoria}
+                                        </span>
+
+                                    </div>
+
+                                    <span class="dashboard-quantidade-baixa">
+                                        ${produto.quantidade} un.
+                                    </span>
+
+                                </div>
+                            `
+                        )
+                        .join("");
+
+            }
+
         }
 
 
-        if (produtosEstoqueBaixo.length === 0) {
+        // ==============================
+        // DADOS FINANCEIROS
+        // SOMENTE ADMINISTRADOR
+        // ==============================
 
-            lista.innerHTML = `
-                <p class="dashboard-vazio">
-                    Nenhum produto com estoque baixo.
-                </p>
-            `;
+        const valorFinanceiroEntradas =
+            document.getElementById(
+                "valorFinanceiroEntradas"
+            );
 
-            return;
+
+        const valorFinanceiroSaidas =
+            document.getElementById(
+                "valorFinanceiroSaidas"
+            );
+
+
+        const graficoFinanceiro =
+            document.getElementById(
+                "graficoFinanceiro"
+            );
+
+
+        /*
+         * Esses elementos só existem
+         * no HTML do Administrador.
+         *
+         * Portanto Gerente e Funcionário
+         * não fazem a requisição financeira.
+         */
+
+        if (
+            valorFinanceiroEntradas ||
+            valorFinanceiroSaidas ||
+            graficoFinanceiro
+        ) {
+
+            const respostaFinanceiro =
+                await fetch(
+                    "/api/dashboard/financeiro"
+                );
+
+
+            if (!respostaFinanceiro.ok) {
+
+                throw new Error(
+                    "Não foi possível carregar os dados financeiros."
+                );
+
+            }
+
+
+            const financeiro =
+                await respostaFinanceiro.json();
+
+
+            // ==============================
+            // VALOR DAS ENTRADAS
+            // ==============================
+
+            if (valorFinanceiroEntradas) {
+
+                valorFinanceiroEntradas.textContent =
+                    Number(
+                        financeiro.valor_entradas ||
+                        0
+                    ).toLocaleString(
+                        "pt-BR",
+                        {
+                            style: "currency",
+                            currency: "BRL"
+                        }
+                    );
+
+            }
+
+
+            // ==============================
+            // VALOR DAS SAÍDAS
+            // ==============================
+
+            if (valorFinanceiroSaidas) {
+
+                valorFinanceiroSaidas.textContent =
+                    Number(
+                        financeiro.valor_saidas ||
+                        0
+                    ).toLocaleString(
+                        "pt-BR",
+                        {
+                            style: "currency",
+                            currency: "BRL"
+                        }
+                    );
+
+            }
+
+
+            // ==============================
+            // GRÁFICO FINANCEIRO
+            // ==============================
+
+            if (
+                graficoFinanceiro &&
+                Array.isArray(
+                    financeiro.grafico_7_dias
+                )
+            ) {
+
+                const dadosGrafico =
+                    financeiro.grafico_7_dias;
+
+
+                // ==============================
+                // MAIOR VALOR DO GRÁFICO
+                // ==============================
+
+                const maiorValor =
+                    Math.max(
+                        ...dadosGrafico.flatMap(
+                            dia => [
+                                Number(
+                                    dia.entradas ||
+                                    0
+                                ),
+                                Number(
+                                    dia.saidas ||
+                                    0
+                                )
+                            ]
+                        ),
+                        1
+                    );
+
+
+                // ==============================
+                // RENDERIZAR OS 7 DIAS
+                // ==============================
+
+                graficoFinanceiro.innerHTML =
+                    dadosGrafico
+                        .map(
+                            dia => {
+
+                                const valorEntrada =
+                                    Number(
+                                        dia.entradas ||
+                                        0
+                                    );
+
+
+                                const valorSaida =
+                                    Number(
+                                        dia.saidas ||
+                                        0
+                                    );
+
+
+                                // ==============================
+                                // ALTURA DAS BARRAS
+                                // ==============================
+
+                                const alturaEntrada =
+                                    valorEntrada > 0
+                                        ? Math.max(
+                                            (
+                                                valorEntrada /
+                                                maiorValor
+                                            ) * 100,
+                                            4
+                                        )
+                                        : 0;
+
+
+                                const alturaSaida =
+                                    valorSaida > 0
+                                        ? Math.max(
+                                            (
+                                                valorSaida /
+                                                maiorValor
+                                            ) * 100,
+                                            4
+                                        )
+                                        : 0;
+
+
+                                // ==============================
+                                // FORMATAR DATA
+                                // ==============================
+
+                                const partesData =
+                                    dia.data.split(
+                                        "-"
+                                    );
+
+
+                                const dataFormatada =
+                                    `${partesData[2]}/${partesData[1]}`;
+
+
+                                // ==============================
+                                // FORMATAR VALORES
+                                // ==============================
+
+                                const entradaFormatada =
+                                    valorEntrada.toLocaleString(
+                                        "pt-BR",
+                                        {
+                                            style: "currency",
+                                            currency: "BRL"
+                                        }
+                                    );
+
+
+                                const saidaFormatada =
+                                    valorSaida.toLocaleString(
+                                        "pt-BR",
+                                        {
+                                            style: "currency",
+                                            currency: "BRL"
+                                        }
+                                    );
+
+
+                                // ==============================
+                                // HTML DO DIA
+                                // ==============================
+
+                                return `
+                                    <div class="grafico-financeiro-dia">
+
+                                        <div class="grafico-financeiro-barras">
+
+                                            <div
+                                                class="barra-financeira entrada"
+                                                style="height: ${alturaEntrada}%"
+                                                title="Entradas: ${entradaFormatada}"
+                                            ></div>
+
+                                            <div
+                                                class="barra-financeira saida"
+                                                style="height: ${alturaSaida}%"
+                                                title="Saídas: ${saidaFormatada}"
+                                            ></div>
+
+                                        </div>
+
+                                        <span class="grafico-financeiro-data">
+                                            ${dataFormatada}
+                                        </span>
+
+                                    </div>
+                                `;
+
+                            }
+                        )
+                        .join("");
+
+            }
+
         }
 
-
-        lista.innerHTML =
-            produtosEstoqueBaixo
-                .slice(0, 5)
-                .map(produto => `
-                    <div class="dashboard-produto-baixo">
-
-                        <div>
-                            <strong>
-                                ${produto.nome}
-                            </strong>
-
-                            <span>
-                                ${produto.sku}
-                                ·
-                                ${produto.categoria}
-                            </span>
-                        </div>
-
-                        <span class="dashboard-quantidade-baixa">
-                            ${produto.quantidade} un.
-                        </span>
-
-                    </div>
-                `)
-                .join("");
 
     } catch (erro) {
 
@@ -4117,15 +4788,7 @@ async function carregarUsuarios() {
 }
 
 
-if (
-    document.getElementById(
-        "tabelaUsuarios"
-    )
-) {
 
-    carregarUsuarios();
-    carregarPerfisUsuario();
-}
 // ==============================
 // MODAL NOVO USUÁRIO
 // ==============================
@@ -5416,5 +6079,476 @@ if (
 ) {
 
     carregarGraficoDashboard();
+
+}
+
+
+// ==============================
+// MODAL - RELATÓRIOS ARQUIVADOS
+// ==============================
+
+const btnRelatoriosArquivados =
+    document.getElementById(
+        "btnRelatoriosArquivados"
+    );
+
+const modalRelatoriosArquivados =
+    document.getElementById(
+        "modalRelatoriosArquivados"
+    );
+
+const btnFecharRelatoriosArquivados =
+    document.getElementById(
+        "btnFecharRelatoriosArquivados"
+    );
+
+const btnCancelarRelatoriosArquivados =
+    document.getElementById(
+        "btnCancelarRelatoriosArquivados"
+    );
+
+
+// ==============================
+// CARREGAR RELATÓRIOS ARQUIVADOS
+// ==============================
+
+async function carregarRelatoriosArquivados() {
+
+    const lista =
+        document.getElementById(
+            "listaRelatoriosArquivados"
+        );
+
+
+    if (!lista) {
+        return;
+    }
+
+
+    // ==============================
+    // ESTADO DE CARREGAMENTO
+    // ==============================
+
+    lista.innerHTML = `
+        <div class="relatorios-arquivados-vazio">
+
+            <div class="relatorios-arquivados-vazio-icone">
+                ⏳
+            </div>
+
+            <strong>
+                Carregando relatórios...
+            </strong>
+
+            <p>
+                Aguarde enquanto os relatórios
+                são localizados.
+            </p>
+
+        </div>
+    `;
+
+
+    try {
+
+        // ==============================
+        // BUSCAR RELATÓRIOS
+        // ==============================
+
+        const resposta =
+            await fetch(
+                "/api/relatorios/arquivados"
+            );
+
+
+        const dados =
+            await resposta.json();
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                dados.erro ||
+                "Não foi possível carregar os relatórios."
+            );
+
+        }
+
+
+        // ==============================
+        // NENHUM RELATÓRIO
+        // ==============================
+
+        if (
+            !Array.isArray(dados) ||
+            dados.length === 0
+        ) {
+
+            lista.innerHTML = `
+                <div class="relatorios-arquivados-vazio">
+
+                    <div class="relatorios-arquivados-vazio-icone">
+                        📄
+                    </div>
+
+                    <strong>
+                        Nenhum relatório arquivado
+                    </strong>
+
+                    <p>
+                        Os relatórios mensais armazenados
+                        aparecerão aqui.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        // ==============================
+        // EXIBIR RELATÓRIOS
+        // ==============================
+
+        lista.innerHTML =
+            dados
+                .map(relatorio => {
+
+                    // ==========================
+                    // TIPO DE GERAÇÃO
+                    // ==========================
+
+                    const automatico =
+                        relatorio.tipo_geracao ===
+                        "automatico";
+
+
+                    const tipoTexto =
+                        automatico
+                            ? "Automático"
+                            : "Manual";
+
+
+                    const tipoClasse =
+                        automatico
+                            ? "automatico"
+                            : "manual";
+
+
+                    // ==========================
+                    // RESPONSÁVEL
+                    // ==========================
+
+                    let responsavel;
+
+
+                    if (automatico) {
+
+                        responsavel =
+                            "Gerado automaticamente pelo EasyStock";
+
+                    } else if (
+                        relatorio.usuario_nome
+                    ) {
+
+                        responsavel =
+                            `Responsável: ${relatorio.usuario_nome}`;
+
+                    } else {
+
+                        responsavel =
+                            "Responsável não registrado";
+
+                    }
+
+
+                    // ==========================
+                    // DATA
+                    // ==========================
+
+                    const dataGeracao =
+                        relatorio.data_geracao ||
+                        relatorio.data_arquivo ||
+                        "Data não registrada";
+
+
+                    // ==========================
+                    // ITEM
+                    // ==========================
+
+                    return `
+                        <div class="relatorio-arquivado-item">
+
+                            <div class="relatorio-arquivado-info">
+
+                                <div class="relatorio-arquivado-icone">
+                                    📄
+                                </div>
+
+
+                                <div class="relatorio-arquivado-dados">
+
+                                    <strong class="relatorio-arquivado-periodo">
+                                        ${escaparHTML(
+                                            relatorio.periodo
+                                        )}
+                                    </strong>
+
+
+                                    <span class="relatorio-arquivado-arquivo">
+                                        ${escaparHTML(
+                                            relatorio.nome_arquivo
+                                        )}
+                                    </span>
+
+
+                                    <div class="relatorio-arquivado-meta">
+
+                                        <span
+                                            class="relatorio-tipo ${tipoClasse}"
+                                        >
+                                            ${tipoTexto}
+                                        </span>
+
+
+                                        <span class="relatorio-data">
+                                            Gerado em
+                                            ${escaparHTML(
+                                                dataGeracao
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <span class="relatorio-responsavel">
+                                        ${escaparHTML(
+                                            responsavel
+                                        )}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="relatorio-arquivado-acoes">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-secundario"
+                                    onclick="baixarRelatorioArquivado(
+                                        ${Number(relatorio.ano)},
+                                        ${Number(relatorio.mes)},
+                                        '${encodeURIComponent(
+                                            relatorio.nome_arquivo
+                                        )}'
+                                    )"
+                                >
+                                    Baixar PDF
+                                </button>
+
+                            </div>
+
+                        </div>
+                    `;
+
+                })
+                .join("");
+
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar relatórios arquivados:",
+            erro
+        );
+
+
+        lista.innerHTML = `
+            <div class="relatorios-arquivados-vazio">
+
+                <div class="relatorios-arquivados-vazio-icone">
+                    ⚠️
+                </div>
+
+                <strong>
+                    Não foi possível carregar os relatórios
+                </strong>
+
+                <p>
+                    ${escaparHTML(
+                        erro.message
+                    )}
+                </p>
+
+            </div>
+        `;
+
+    }
+
+}
+// ==============================
+// ABRIR MODAL
+// ==============================
+
+async function abrirModalRelatoriosArquivados() {
+
+    if (!modalRelatoriosArquivados) {
+        return;
+    }
+
+    // Abre o modal primeiro.
+    modalRelatoriosArquivados.classList.add(
+        "ativo"
+    );
+
+    // Depois carrega os relatórios.
+    await carregarRelatoriosArquivados();
+
+}
+
+
+// ==============================
+// FECHAR MODAL
+// ==============================
+
+function fecharModalRelatoriosArquivados() {
+
+    if (!modalRelatoriosArquivados) {
+        return;
+    }
+
+    modalRelatoriosArquivados.classList.remove(
+        "ativo"
+    );
+
+}
+
+
+// ==============================
+// BOTÃO VER RELATÓRIOS
+// ==============================
+
+if (btnRelatoriosArquivados) {
+
+    btnRelatoriosArquivados.addEventListener(
+        "click",
+        abrirModalRelatoriosArquivados
+    );
+
+}
+
+
+// ==============================
+// BOTÃO X
+// ==============================
+
+if (btnFecharRelatoriosArquivados) {
+
+    btnFecharRelatoriosArquivados.addEventListener(
+        "click",
+        fecharModalRelatoriosArquivados
+    );
+
+}
+
+
+// ==============================
+// BOTÃO FECHAR
+// ==============================
+
+if (btnCancelarRelatoriosArquivados) {
+
+    btnCancelarRelatoriosArquivados.addEventListener(
+        "click",
+        fecharModalRelatoriosArquivados
+    );
+
+}
+
+
+// ==============================
+// CLIQUE FORA DO MODAL
+// ==============================
+
+if (modalRelatoriosArquivados) {
+
+    modalRelatoriosArquivados.addEventListener(
+        "click",
+        evento => {
+
+            if (
+                evento.target ===
+                modalRelatoriosArquivados
+            ) {
+
+                fecharModalRelatoriosArquivados();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==============================
+// TECLA ESC
+// ==============================
+
+document.addEventListener(
+    "keydown",
+    evento => {
+
+        if (
+            evento.key === "Escape" &&
+            modalRelatoriosArquivados &&
+            modalRelatoriosArquivados.classList.contains(
+                "ativo"
+            )
+        ) {
+
+            fecharModalRelatoriosArquivados();
+
+        }
+
+    }
+);
+// ==============================
+// BAIXAR RELATÓRIO ARQUIVADO
+// ==============================
+
+function baixarRelatorioArquivado(
+    ano,
+    mes,
+    nomeArquivo
+) {
+
+    if (
+        !ano ||
+        !mes ||
+        !nomeArquivo
+    ) {
+
+        mostrarMensagem(
+            "Não foi possível identificar o relatório.",
+            "erro"
+        );
+
+        return;
+    }
+
+
+    const url =
+        `/api/relatorios/arquivados/` +
+        `${ano}/` +
+        `${mes}/` +
+        `${nomeArquivo}`;
+
+
+    window.location.href = url;
 
 }

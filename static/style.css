@@ -1088,9 +1088,9 @@ body {
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
     gap: 20px;
-    align-items: start;
+    align-items: stretch;
 }
 
 .dashboard-grid>.card {
@@ -3117,9 +3117,9 @@ body {
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
     gap: 20px;
-    align-items: start;
+    align-items: stretch;
 }
 
 .dashboard-movimentacoes {
@@ -3323,4 +3323,1132 @@ body {
     .historico-filtros {
         grid-template-columns: 1fr;
     }
+}
+/* ==============================
+   DASHBOARD - CABEÇALHO FINANCEIRO
+   ============================== */
+
+.dashboard-cabecalho {
+    align-items: center;
+}
+
+
+.dashboard-cabecalho-acoes {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+
+.dashboard-valor-estoque {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-width: 220px;
+
+    padding: 12px 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+
+.dashboard-valor-estoque>div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+
+.dashboard-valor-estoque span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+
+.dashboard-valor-estoque strong {
+    font-size: 20px;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+
+.dashboard-valor-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+
+    margin-left: 20px;
+
+    border-radius: 8px;
+
+    background: #e0f2fe;
+    color: #0284c7;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+/* ==============================
+   DASHBOARD - CABEÇALHO
+   ============================== */
+
+.dashboard-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+/* TÍTULO + VALOR DO ESTOQUE */
+
+.dashboard-titulo-area {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+
+.dashboard-titulo h1 {
+    margin-bottom: 4px;
+}
+
+
+/* VALOR EM ESTOQUE */
+
+.dashboard-valor-estoque {
+    display: flex;
+    align-items: center;
+
+    min-width: 210px;
+
+    padding: 9px 12px;
+
+    background: #ffffff;
+
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+
+.dashboard-valor-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+
+.dashboard-valor-conteudo span {
+    font-size: 11px;
+    color: #64748b;
+}
+
+
+.dashboard-valor-conteudo strong {
+    font-size: 19px;
+    line-height: 1.2;
+    color: #0f172a;
+    white-space: nowrap;
+}
+
+
+.dashboard-valor-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    margin-left: auto;
+
+    border-radius: 8px;
+
+    background: #e0f2fe;
+    color: #0284c7;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+/* ==============================
+   DASHBOARD - VALORES FINANCEIROS
+   ============================== */
+
+.periodo-valor-financeiro {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.periodo-card.entrada .periodo-valor-financeiro {
+    color: #15803d;
+}
+
+
+.periodo-card.saida .periodo-valor-financeiro {
+    color: #0369a1;
+}
+
+
+/* ==============================
+   DASHBOARD - COLUNAS
+   ============================== */
+
+.dashboard-grid {
+    align-items: stretch;
+}
+
+
+.dashboard-coluna-graficos,
+.dashboard-coluna-lateral {
+    display: grid;
+
+    /*
+       As duas colunas utilizam exatamente
+       a mesma divisão de linhas.
+
+       Isso faz:
+       - gráfico estoque alinhar com resumo;
+       - gráfico financeiro alinhar com estoque baixo.
+    */
+
+    grid-template-rows:
+        minmax(0, 0.9fr) minmax(0, 1.1fr);
+
+    gap: 20px;
+
+    min-width: 0;
+}
+
+
+.dashboard-movimentacoes,
+.dashboard-financeiro-card,
+.dashboard-periodo,
+.dashboard-baixo {
+    height: 100%;
+    min-height: 0;
+}
+
+
+/* ==============================
+   DASHBOARD - GRÁFICO FINANCEIRO
+   ============================== */
+
+.dashboard-financeiro-card {
+    margin-top: 0;
+}
+
+
+.dashboard-grafico-financeiro {
+    width: 100%;
+
+    padding-top: 10px;
+}
+
+
+.grafico-financeiro {
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, 1fr);
+
+    align-items: end;
+
+    width: 100%;
+    height: 210px;
+
+    padding:
+        15px 20px 0;
+
+    border-bottom:
+        1px solid #dbe3ee;
+}
+
+
+.grafico-financeiro-dia {
+    display: flex;
+
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+
+    height: 100%;
+
+    min-width: 0;
+}
+
+
+.grafico-financeiro-barras {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: center;
+
+    gap: 6px;
+
+    width: 100%;
+    height: 165px;
+}
+
+
+.barra-financeira {
+    width: 26px;
+    max-width: 35%;
+
+    border-radius:
+        5px 5px 0 0;
+
+    cursor: pointer;
+
+    transition:
+        height 0.25s ease,
+        opacity 0.2s ease;
+}
+
+
+.barra-financeira:hover {
+    opacity: 0.8;
+}
+
+
+.barra-financeira.entrada {
+    background: #1677ff;
+}
+
+
+.barra-financeira.saida {
+    background: #16a34a;
+}
+
+.grafico-financeiro-data {
+    display: block;
+
+    margin-top: 10px;
+
+    font-size: 12px;
+    color: #64748b;
+}
+
+
+/* ==============================
+   RESPONSIVIDADE - TABLET
+   ============================== */
+
+@media (max-width: 900px) {
+
+    .dashboard-cabecalho {
+        align-items: flex-start;
+
+        gap: 16px;
+
+        flex-wrap: wrap;
+    }
+
+
+    .dashboard-titulo-area {
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+
+        gap: 12px;
+    }
+
+
+    .dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(320px, 1fr);
+
+    gap: 20px;
+
+    align-items: stretch;
+}
+
+
+    /*
+       Quando virar uma coluna,
+       não precisamos mais forçar
+       as duas linhas com mesma altura.
+    */
+
+    .dashboard-coluna-graficos,
+    .dashboard-coluna-lateral {
+        grid-template-rows: auto;
+
+        gap: 20px;
+    }
+
+
+    .dashboard-movimentacoes,
+    .dashboard-financeiro-card,
+    .dashboard-periodo,
+    .dashboard-baixo {
+        height: auto;
+    }
+
+}
+
+
+/* ==============================
+   RESPONSIVIDADE - CELULAR
+   ============================== */
+
+@media (max-width: 700px) {
+
+    .grafico-financeiro {
+        overflow-x: auto;
+
+        grid-template-columns:
+            repeat(7,
+                minmax(80px, 1fr));
+    }
+
+}
+/* =========================================================
+   HISTÓRICO - CABEÇALHO E RELATÓRIOS
+   ========================================================= */
+
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+
+.historico-cabecalho {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 16px;
+
+    width: 100%;
+
+    margin-bottom: 20px;
+}
+
+
+/* TÍTULO DA PÁGINA */
+
+.historico-cabecalho>div:first-child {
+    width: 100%;
+}
+
+
+.historico-cabecalho>div:first-child h1 {
+    margin: 0;
+}
+
+
+.historico-cabecalho>div:first-child p {
+    margin: 4px 0 0;
+}
+
+
+/* =========================================================
+   ÁREA DOS DOIS CARDS
+   ========================================================= */
+
+.historico-acoes-admin {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2fr) minmax(330px, 1fr);
+
+    gap: 12px;
+
+    width: 100%;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.historico-relatorio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 14px 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TÍTULO E DESCRIÇÃO DOS CARDS
+   ========================================================= */
+
+.historico-relatorio-titulo {
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+
+    min-width: 0;
+}
+
+
+.historico-relatorio-titulo strong {
+    font-size: 14px;
+    font-weight: 700;
+
+    line-height: 1.3;
+
+    color: #0f172a;
+
+    white-space: nowrap;
+}
+
+
+.historico-relatorio-titulo span {
+    font-size: 12px;
+
+    line-height: 1.3;
+
+    color: #64748b;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   CONTROLES
+   ========================================================= */
+
+.historico-relatorio-controles {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+
+/* SELECTS */
+
+.historico-relatorio-controles select {
+    height: 40px;
+
+    padding: 0 10px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-size: 14px;
+
+    outline: none;
+
+    box-sizing: border-box;
+}
+
+
+#relatorioMes {
+    width: 120px;
+}
+
+
+#relatorioAno {
+    width: 100px;
+}
+
+
+.historico-relatorio-controles select:focus {
+    border-color: #2563eb;
+}
+
+
+/* =========================================================
+   BOTÕES
+   ========================================================= */
+
+.historico-relatorio-controles .btn {
+    flex-shrink: 0;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   RELATÓRIOS ARQUIVADOS
+   ========================================================= */
+
+.historico-arquivados {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    .historico-acoes-admin {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .historico-relatorio {
+        flex-direction: column;
+        align-items: flex-start;
+
+        gap: 12px;
+    }
+
+
+    .historico-relatorio-titulo span {
+        white-space: normal;
+    }
+
+
+    .historico-relatorio-controles {
+        width: 100%;
+
+        justify-content: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+
+    #relatorioMes,
+    #relatorioAno {
+        flex: 1;
+
+        width: auto;
+
+        min-width: 100px;
+    }
+
+
+    .historico-relatorio-controles .btn {
+        flex: 1;
+    }
+
+}
+
+
+/* ==============================
+   RESPONSIVIDADE
+   ============================== */
+
+@media (max-width: 1450px) {
+
+    .historico-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .historico-acoes-admin {
+        width: 100%;
+
+        margin-left: 0;
+    }
+
+
+    .historico-acoes-admin .historico-relatorio:first-child {
+        flex: 1;
+
+        min-width: 0;
+    }
+
+
+    .historico-arquivados {
+        min-width: 340px;
+    }
+
+}
+
+
+@media (max-width: 1000px) {
+
+    .historico-acoes-admin {
+        flex-direction: column;
+    }
+
+
+    .historico-relatorio,
+    .historico-acoes-admin .historico-relatorio:first-child,
+    .historico-arquivados {
+        width: 100%;
+        min-width: 0;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .historico-relatorio {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .historico-relatorio-controles {
+        width: 100%;
+
+        flex-wrap: wrap;
+    }
+
+
+    #relatorioMes,
+    #relatorioAno {
+        flex: 1;
+
+        width: auto;
+        min-width: 110px;
+    }
+
+
+    .historico-relatorio-controles .btn {
+        flex: 1;
+    }
+
+}
+/* ==============================
+   MODAL - RELATÓRIOS ARQUIVADOS
+   ============================== */
+
+.modal-relatorios {
+    width: min(700px, calc(100% - 32px));
+    max-height: 80vh;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.20);
+
+    overflow: hidden;
+}
+
+
+/* ==============================
+   CABEÇALHO
+   ============================== */
+
+.modal-relatorios .modal-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+
+.modal-relatorios .modal-cabecalho h2 {
+    margin: 0;
+
+    font-size: 20px;
+    color: #0f172a;
+}
+
+
+.modal-relatorios .modal-cabecalho p {
+    margin: 4px 0 0;
+
+    font-size: 13px;
+    color: #64748b;
+}
+
+
+/* ==============================
+   BOTÃO X
+   ============================== */
+
+.modal-relatorios .modal-fechar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #64748b;
+
+    font-size: 24px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+
+.modal-relatorios .modal-fechar:hover {
+    background: #f1f5f9;
+
+    color: #0f172a;
+}
+
+
+/* ==============================
+   LISTA DE RELATÓRIOS
+   ============================== */
+
+.modal-relatorios .relatorios-arquivados-lista {
+    flex: 1;
+
+    min-height: 220px;
+    max-height: 430px;
+
+    margin: 0;
+    padding: 20px 24px;
+
+    overflow-y: auto;
+}
+
+
+/* ==============================
+   ESTADO VAZIO
+   ============================== */
+
+.modal-relatorios .relatorios-arquivados-vazio {
+    min-height: 200px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    text-align: center;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+
+    background: #f8fafc;
+}
+
+
+.modal-relatorios .relatorios-arquivados-vazio-icone {
+    margin-bottom: 10px;
+
+    font-size: 30px;
+}
+
+
+.modal-relatorios .relatorios-arquivados-vazio strong {
+    font-size: 15px;
+
+    color: #0f172a;
+}
+
+
+.modal-relatorios .relatorios-arquivados-vazio p {
+    margin: 5px 0 0;
+
+    font-size: 13px;
+
+    color: #64748b;
+}
+
+
+/* ==============================
+   RODAPÉ
+   ============================== */
+
+.modal-relatorios .modal-acoes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 16px 24px;
+
+    border-top: 1px solid #e2e8f0;
+
+    background: #ffffff;
+}
+
+
+/* ==============================
+   RESPONSIVIDADE
+   ============================== */
+
+@media (max-width: 700px) {
+
+    .modal-relatorios {
+        width: calc(100% - 24px);
+        max-height: 90vh;
+    }
+
+
+    .modal-relatorios .modal-cabecalho {
+        padding: 18px;
+    }
+
+
+    .modal-relatorios .relatorios-arquivados-lista {
+        padding: 18px;
+    }
+
+
+    .modal-relatorios .modal-acoes {
+        padding: 14px 18px;
+    }
+
+}
+/* =========================================================
+   RELATÓRIOS ARQUIVADOS - LAYOUT DOS ITENS
+   ========================================================= */
+
+.relatorios-arquivados-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    margin-top: 0;
+}
+
+
+/* =========================================================
+   CARD DE CADA RELATÓRIO
+   ========================================================= */
+
+.relatorio-arquivado-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+
+.relatorio-arquivado-info {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 14px;
+
+    min-width: 0;
+    flex: 1;
+}
+
+
+/* =========================================================
+   ÍCONE
+   ========================================================= */
+
+.relatorio-arquivado-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    background: #eff6ff;
+
+    border-radius: 10px;
+
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   INFORMAÇÕES
+   ========================================================= */
+
+.relatorio-arquivado-dados {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    min-width: 0;
+}
+
+
+.relatorio-arquivado-periodo {
+    font-size: 15px;
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.relatorio-arquivado-arquivo {
+    font-size: 13px;
+
+    color: #64748b;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   METADADOS
+   ========================================================= */
+
+.relatorio-arquivado-meta {
+    display: flex;
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   BADGE MANUAL / AUTOMÁTICO
+   ========================================================= */
+
+.relatorio-tipo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: fit-content;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* MANUAL */
+
+.relatorio-tipo.manual {
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
+
+/* AUTOMÁTICO */
+
+.relatorio-tipo.automatico {
+    color: #166534;
+    background: #dcfce7;
+}
+
+
+/* =========================================================
+   DATA
+   ========================================================= */
+
+.relatorio-data {
+    font-size: 12px;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   RESPONSÁVEL
+   ========================================================= */
+
+.relatorio-responsavel {
+    font-size: 12px;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   BOTÃO
+   ========================================================= */
+
+.relatorio-arquivado-acoes {
+    display: flex;
+    align-items: center;
+
+    flex-shrink: 0;
+}
+
+
+.relatorio-arquivado-acoes .btn {
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .relatorio-arquivado-item {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 14px;
+    }
+
+
+    .relatorio-arquivado-acoes {
+        width: 100%;
+    }
+
+
+    .relatorio-arquivado-acoes .btn {
+        width: 100%;
+    }
+
 }

@@ -15,3 +15,6 @@ env/
 
 # VS Code
 .vscode/
+
+# Relatórios PDF gerados pelo sistema
+relatorios/
