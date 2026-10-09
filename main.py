@@ -1271,6 +1271,160 @@ def pagina_historico():
         "historico.html",
         pagina_ativa="historico"
     )
+
+# ==============================
+# PÁGINA DE ANÁLISE DO ESTOQUE
+# SPRINT 06
+# ==============================
+
+@app.route("/analise")
+def pagina_analise():
+
+    if "usuario_id" not in session:
+        return redirect("/login")
+
+    return render_template(
+        "analise.html",
+        pagina_ativa="analise"
+    )
+# ==============================
+# SPRINT 06 - INDICADORES DO ESTOQUE
+# ==============================
+
+@app.route("/api/analise/indicadores", methods=["GET"])
+def indicadores_estoque():
+
+    if "usuario_id" not in session:
+        return jsonify({
+            "erro": "Usuário não autenticado."
+        }), 401
+
+    conn = conectar_banco()
+
+    indicadores = conn.execute("""
+        SELECT
+            COALESCE(SUM(preco * quantidade), 0)
+                AS valor_total_estoque,
+
+            COALESCE(SUM(quantidade), 0)
+                AS total_unidades,
+
+            COALESCE(SUM(
+                CASE WHEN quantidade = 0 THEN 1 ELSE 0 END
+            ), 0) AS produtos_sem_estoque,
+
+            COALESCE(SUM(
+                CASE
+                    WHEN quantidade BETWEEN 1 AND 5
+                    THEN 1
+                    ELSE 0
+                END
+            ), 0) AS produtos_estoque_baixo
+
+        FROM produtos
+    """).fetchone()
+
+    conn.close()
+
+    return jsonify(dict(indicadores)), 200
+
+
+# ==========================================
+# SPRINT 06 - RESUMO DAS MOVIMENTAÇÕES
+# ==========================================
+
+@app.route("/api/analise/movimentacoes", methods=["GET"])
+def analise_movimentacoes():
+
+    if "usuario_id" not in session:
+        return jsonify({
+            "erro": "Usuário não autenticado."
+        }), 401
+
+    conn = conectar_banco()
+
+    resumo = conn.execute("""
+        SELECT
+            COALESCE(SUM(
+                CASE WHEN tipo = 'entrada'
+                THEN 1 ELSE 0 END
+            ), 0) AS total_entradas,
+
+            COALESCE(SUM(
+                CASE WHEN tipo = 'saida'
+                THEN 1 ELSE 0 END
+            ), 0) AS total_saidas,
+
+            COALESCE(SUM(
+                CASE WHEN tipo = 'entrada'
+                THEN quantidade ELSE 0 END
+            ), 0) AS unidades_entrada,
+
+            COALESCE(SUM(
+                CASE WHEN tipo = 'saida'
+                THEN quantidade ELSE 0 END
+            ), 0) AS unidades_saida
+
+        FROM movimentacoes
+    """).fetchone()
+
+    conn.close()
+
+    return jsonify(dict(resumo)), 200
+
+
+# ==========================================
+# SPRINT 06 - PRODUTOS MAIS MOVIMENTADOS
+# ==========================================
+
+@app.route("/api/analise/produtos-mais-movimentados", methods=["GET"])
+def produtos_mais_movimentados():
+
+    if "usuario_id" not in session:
+        return jsonify({
+            "erro": "Usuário não autenticado."
+        }), 401
+
+    conn = conectar_banco()
+
+    produtos = conn.execute("""
+        SELECT
+            produto_id,
+            COALESCE(
+                produto_nome,
+                'Produto não identificado'
+            ) AS nome,
+
+            COUNT(*) AS total_operacoes,
+
+            COALESCE(
+                SUM(quantidade),
+                0
+            ) AS unidades_movimentadas
+
+        FROM movimentacoes
+
+        WHERE tipo IN ('entrada', 'saida')
+
+        GROUP BY
+            produto_id,
+            produto_nome
+
+        ORDER BY
+            unidades_movimentadas DESC,
+            total_operacoes DESC,
+            nome ASC
+
+        LIMIT 5
+    """).fetchall()
+
+    conn.close()
+
+    return jsonify([
+        dict(produto)
+        for produto in produtos
+    ]), 200
+
 @app.route("/usuarios")
 def pagina_usuarios():
 
