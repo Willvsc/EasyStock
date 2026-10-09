@@ -4452,3 +4452,1993 @@ body {
     }
 
 }
+/* ==========================================
+   SPRINT 06 - ANÁLISE DO ESTOQUE
+========================================== */
+
+.analise-indicadores {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.analise-indicadores .card {
+    min-width: 0;
+    padding: 24px;
+}
+
+.analise-indicadores .card h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.analise-indicadores .card h2 {
+    margin: 0 0 12px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+    color: var(--text-primary);
+}
+
+.analise-indicadores .card p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+/* TELAS MÉDIAS */
+
+@media (max-width: 1200px) {
+    .analise-indicadores {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* CELULARES */
+
+@media (max-width: 600px) {
+    .analise-indicadores {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .analise-indicadores .card {
+        padding: 20px;
+    }
+}
+/* ==========================================
+   SPRINT 06 - REFINAMENTO DOS INDICADORES
+========================================== */
+
+.analise-indicadores .card {
+    display: flex;
+    flex-direction: column;
+    min-height: 175px;
+    padding: 22px 24px;
+}
+
+.analise-indicadores .card h3 {
+    margin: 0 0 18px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.analise-indicadores .card h2 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+}
+
+.analise-indicadores .card p {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid #e8edf3;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+/* ==========================================
+   SPRINT 06 - VISUAL DO RANKING
+========================================== */
+
+.analise-secao-titulo {
+    display: block;
+    width: 100%;
+    margin-top: 36px;
+    margin-bottom: 18px;
+}
+
+.analise-secao-titulo h2 {
+    margin: 0 0 6px;
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.analise-secao-titulo p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+/* Card principal do ranking */
+
+.analise-ranking {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 24px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Tabela */
+
+.analise-ranking .tabela-container {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.analise-ranking table {
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.analise-ranking thead {
+    background-color: #f5f7fa;
+}
+
+.analise-ranking th {
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    border-bottom: 1px solid #e8edf3;
+}
+
+.analise-ranking td {
+    padding: 18px;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid #edf0f4;
+    vertical-align: middle;
+}
+
+.analise-ranking tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.analise-ranking tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Distribuição das colunas */
+
+.analise-ranking th:first-child,
+.analise-ranking td:first-child {
+    width: 12%;
+    font-weight: 700;
+}
+
+.analise-ranking th:nth-child(2),
+.analise-ranking td:nth-child(2) {
+    width: 40%;
+}
+
+.analise-ranking th:nth-child(3),
+.analise-ranking td:nth-child(3) {
+    width: 24%;
+}
+
+.analise-ranking th:nth-child(4),
+.analise-ranking td:nth-child(4) {
+    width: 24%;
+}
+
+/* Responsividade */
+
+@media (max-width: 768px) {
+    .analise-ranking {
+        padding: 16px;
+    }
+
+    .analise-ranking table {
+        min-width: 620px;
+    }
+
+    .analise-ranking th,
+    .analise-ranking td {
+        padding: 14px 12px;
+    }
+
+    .analise-secao-titulo {
+        margin-top: 28px;
+    }
+}
+/* ==========================================
+   SPRINT 06 - ESTRUTURA DO RANKING
+========================================== */
+
+.analise-ranking-secao {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    margin-top: 36px;
+    gap: 18px;
+}
+
+.analise-ranking-cabecalho {
+    display: block;
+    width: 100%;
+}
+
+.analise-ranking-cabecalho h2 {
+    margin: 0 0 6px;
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.analise-ranking-cabecalho p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.analise-ranking-secao .analise-ranking {
+    display: block;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+/* ==========================================
+   SPRINT 06 - RANKING PROFISSIONAL
+========================================== */
+
+.ranking-produtos-secao {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin-top: 36px;
+}
+
+.ranking-produtos-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e8edf3;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+}
+
+.ranking-produtos-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 28px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.ranking-produtos-topo h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.ranking-produtos-topo p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.ranking-produtos-badge {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border-radius: 8px;
+    background: #eaf3ff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.ranking-produtos-tabela-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.ranking-produtos-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.ranking-produtos-tabela thead {
+    background: #f8fafc;
+}
+
+.ranking-produtos-tabela th {
+    padding: 16px 24px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    white-space: nowrap;
+    border-bottom: 1px solid #e8edf3;
+}
+
+.ranking-produtos-tabela td {
+    padding: 18px 24px;
+    font-size: 14px;
+    color: #334155;
+    vertical-align: middle;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.ranking-produtos-tabela tbody tr:hover {
+    background: #f8fbff;
+}
+
+.ranking-produtos-tabela tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.ranking-produtos-tabela th:first-child,
+.ranking-produtos-tabela td:first-child {
+    width: 12%;
+    font-weight: 700;
+}
+
+.ranking-produtos-tabela th:nth-child(2),
+.ranking-produtos-tabela td:nth-child(2) {
+    width: 40%;
+}
+
+.ranking-produtos-tabela th:nth-child(3),
+.ranking-produtos-tabela td:nth-child(3) {
+    width: 20%;
+}
+
+.ranking-produtos-tabela th:nth-child(4),
+.ranking-produtos-tabela td:nth-child(4) {
+    width: 28%;
+}
+
+@media (max-width: 768px) {
+
+    .ranking-produtos-topo {
+        padding: 20px;
+    }
+
+    .ranking-produtos-tabela {
+        min-width: 650px;
+    }
+
+    .ranking-produtos-tabela th,
+    .ranking-produtos-tabela td {
+        padding: 14px 16px;
+    }
+
+}
+/* ==========================================
+   SPRINT 06 - FILTRO POR PERÍODO
+========================================== */
+
+.analise-filtros {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+
+    width: 100%;
+    margin-top: 28px;
+    padding: 24px 28px;
+
+    background: #ffffff;
+    border: 1px solid #e8edf3;
+    border-radius: 14px;
+
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    box-sizing: border-box;
+}
+
+/* Cabeçalho */
+
+.analise-filtros-cabecalho h3 {
+    margin: 0 0 6px;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    color: var(--text-primary);
+}
+
+.analise-filtros-cabecalho p {
+    margin: 0;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: var(--text-secondary);
+}
+
+/* Campos */
+
+.analise-filtros-campos {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.analise-filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    flex: 1 1 180px;
+    max-width: 280px;
+}
+
+.analise-filtro-grupo label {
+    font-size: 12px;
+    font-weight: 600;
+
+    color: var(--text-primary);
+}
+
+.analise-filtro-grupo select,
+.analise-filtro-grupo input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+
+    background: #ffffff;
+    border: 1px solid #dce3eb;
+    border-radius: 8px;
+
+    color: var(--text-primary);
+    font-size: 14px;
+
+    box-sizing: border-box;
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.analise-filtro-grupo select:focus,
+.analise-filtro-grupo input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Botão */
+
+#analiseAplicarFiltro {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 150px;
+    height: 42px;
+    padding: 0 20px;
+
+    background: #2563eb;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+#analiseAplicarFiltro:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+#analiseAplicarFiltro:active {
+    transform: translateY(0);
+}
+
+/* Responsividade */
+
+@media (max-width: 600px) {
+
+    .analise-filtros {
+        padding: 20px;
+    }
+
+    .analise-filtros-campos {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .analise-filtro-grupo {
+        flex: none;
+        width: 100%;
+        max-width: none;
+    }
+
+    #analiseAplicarFiltro {
+        width: 100%;
+    }
+
+}
+/* ==========================================
+   SPRINT 06 - FILTROS NO CABEÇALHO
+========================================== */
+
+.analise-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.analise-cabecalho>div:first-child {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.analise-cabecalho .analise-filtros-campos {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: flex-end;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 10px;
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+}
+
+.analise-cabecalho .analise-filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    gap: 6px;
+    width: 150px;
+    max-width: none;
+    min-width: 0;
+}
+
+.analise-cabecalho .analise-filtro-grupo label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.analise-cabecalho .analise-filtro-grupo select,
+.analise-cabecalho .analise-filtro-grupo input {
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #dce3eb;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text-primary);
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.analise-cabecalho #analiseAplicarFiltro {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 120px;
+    height: 40px;
+    padding: 0 16px;
+    margin: 0;
+    white-space: nowrap;
+    border-radius: 8px;
+}
+
+/* Telas menores */
+
+@media (max-width: 900px) {
+    .analise-cabecalho {
+        align-items: flex-start;
+    }
+
+    .analise-cabecalho .analise-filtros-campos {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .analise-cabecalho .analise-filtro-grupo {
+        flex: 1 1 120px;
+    }
+
+    .analise-cabecalho #analiseAplicarFiltro {
+        width: 100%;
+    }
+}
+/* Título do filtro no cabeçalho */
+
+.analise-filtro-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.analise-filtro-titulo {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.2px;
+}
+/* ==========================================
+   SPRINT 06 - REFINAMENTO DO FILTRO
+========================================== */
+
+.analise-cabecalho .analise-filtro-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 0 0 auto;
+    gap: 12px;
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+}
+
+.analise-cabecalho .analise-filtro-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--text-primary);
+}
+
+.analise-cabecalho .analise-filtro-titulo::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    border-radius: 4px;
+    background: #2563eb;
+}
+
+.analise-cabecalho .analise-filtro-container .analise-filtros-campos {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+}
+
+.analise-cabecalho .analise-filtro-container .analise-filtro-grupo {
+    gap: 6px;
+}
+
+@media (max-width: 600px) {
+    .analise-cabecalho .analise-filtro-container {
+        width: 100%;
+    }
+
+    .analise-cabecalho .analise-filtro-container .analise-filtros-campos {
+        flex-wrap: wrap;
+    }
+}
+/* ==========================================
+   SPRINT 06 - DASHBOARD ANALÍTICO PREMIUM
+   INDICADORES GERAIS
+========================================== */
+
+/* Grid com hierarquia visual */
+
+.analise-indicadores:not(.analise-movimentacoes) {
+    display: grid;
+    grid-template-columns: 1.35fr repeat(3, 1fr);
+    gap: 18px;
+    align-items: stretch;
+}
+
+/* Base dos indicadores */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 190px;
+    padding: 26px;
+    overflow: hidden;
+
+    background: linear-gradient(145deg,
+            #ffffff 0%,
+            #f9fbff 100%);
+
+    border: 1px solid #e5ebf3;
+    border-radius: 16px;
+
+    box-shadow:
+        0 2px 5px rgba(15, 23, 42, 0.025),
+        0 10px 28px rgba(15, 23, 42, 0.035);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+/* Efeito de elevação */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 8px 18px rgba(15, 23, 42, 0.06),
+        0 18px 36px rgba(15, 23, 42, 0.07);
+
+    border-color: #cbd9ed;
+}
+
+/* Etiquetas */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card h3 {
+    position: relative;
+    z-index: 1;
+
+    margin: 0 0 20px;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+
+    color: #64748b;
+}
+
+/* Valores principais */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card h2 {
+    position: relative;
+    z-index: 1;
+
+    margin: 0;
+
+    font-size: clamp(26px, 2.1vw, 36px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1px;
+
+    color: #0f172a;
+}
+
+/* Descrições */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card p {
+    position: relative;
+    z-index: 1;
+
+    margin-top: auto;
+    padding-top: 16px;
+
+    font-size: 12px;
+    line-height: 1.5;
+
+    color: #64748b;
+    border-top: 1px solid #e9eef5;
+}
+
+/* ==========================================
+   CARD PRINCIPAL - VALOR DO ESTOQUE
+========================================== */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:first-child {
+
+    background: linear-gradient(135deg,
+            #1e40af 0%,
+            #2563eb 55%,
+            #3b82f6 100%);
+
+    border-color: transparent;
+
+    box-shadow:
+        0 12px 30px rgba(37, 99, 235, 0.18);
+}
+
+/* Elemento decorativo */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:first-child::before {
+
+    content: "";
+    position: absolute;
+
+    width: 210px;
+    height: 210px;
+
+    top: -115px;
+    right: -70px;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:first-child::after {
+
+    content: "";
+    position: absolute;
+
+    width: 130px;
+    height: 130px;
+
+    right: -35px;
+    bottom: -75px;
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 50%;
+}
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:first-child h3 {
+
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:first-child h2 {
+
+    color: #ffffff;
+    font-size: clamp(30px, 2.5vw, 42px);
+}
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:first-child p {
+
+    color: rgba(255, 255, 255, 0.82);
+    border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================
+   DESTAQUES SEMÂNTICOS
+========================================== */
+
+/* Total de unidades */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:nth-child(2) {
+
+    border-top: 3px solid #3b82f6;
+}
+
+/* Produtos sem estoque */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:nth-child(3) {
+
+    border-top: 3px solid #ef4444;
+}
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:nth-child(3) h2 {
+
+    color: #dc2626;
+}
+
+/* Estoque baixo */
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:nth-child(4) {
+
+    border-top: 3px solid #f59e0b;
+}
+
+.analise-indicadores:not(.analise-movimentacoes)>.card:nth-child(4) h2 {
+
+    color: #d97706;
+}
+
+/* ==========================================
+   RESPONSIVIDADE
+========================================== */
+
+@media (max-width: 1200px) {
+
+    .analise-indicadores:not(.analise-movimentacoes) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .analise-indicadores:not(.analise-movimentacoes) {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .analise-indicadores:not(.analise-movimentacoes)>.card {
+        min-height: 165px;
+        padding: 22px;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .analise-indicadores:not(.analise-movimentacoes)>.card {
+        transition: none;
+    }
+
+    .analise-indicadores:not(.analise-movimentacoes)>.card:hover {
+        transform: none;
+    }
+
+}
+/* ==========================================
+   SPRINT 06 - MOVIMENTAÇÕES ANALÍTICAS
+========================================== */
+
+.analise-movimentacoes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+/* Estrutura dos cards */
+
+.analise-movimentacoes>.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 185px;
+    padding: 24px 26px;
+    overflow: hidden;
+
+    background: #ffffff;
+    border: 1px solid #e5ebf3;
+    border-radius: 16px;
+
+    box-shadow:
+        0 3px 8px rgba(15, 23, 42, 0.025),
+        0 12px 28px rgba(15, 23, 42, 0.035);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.analise-movimentacoes>.card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* Etiquetas */
+
+.analise-movimentacoes>.card h3 {
+    margin: 0 48px 20px 0;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+
+    color: #64748b;
+}
+
+/* Valores */
+
+.analise-movimentacoes>.card h2 {
+    margin: 0;
+
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -1px;
+}
+
+/* Descrições */
+
+.analise-movimentacoes>.card p {
+    margin-top: auto;
+    padding-top: 16px;
+
+    font-size: 12px;
+    line-height: 1.5;
+    color: #64748b;
+
+    border-top: 1px solid #edf0f4;
+}
+
+/* ==========================================
+   ÍCONES VISUAIS
+========================================== */
+
+.analise-movimentacoes>.card::before {
+    position: absolute;
+    top: 20px;
+    right: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 12px;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* Entradas */
+
+.analise-movimentacoes>.card:nth-child(1) {
+    border-left: 4px solid #10b981;
+}
+
+.analise-movimentacoes>.card:nth-child(1)::before {
+    content: "↙";
+    color: #059669;
+    background: #ecfdf5;
+}
+
+.analise-movimentacoes>.card:nth-child(1) h2 {
+    color: #059669;
+}
+
+/* Saídas */
+
+.analise-movimentacoes>.card:nth-child(2) {
+    border-left: 4px solid #ef4444;
+}
+
+.analise-movimentacoes>.card:nth-child(2)::before {
+    content: "↗";
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+.analise-movimentacoes>.card:nth-child(2) h2 {
+    color: #dc2626;
+}
+
+/* Unidades recebidas */
+
+.analise-movimentacoes>.card:nth-child(3) {
+    border-left: 4px solid #10b981;
+}
+
+.analise-movimentacoes>.card:nth-child(3)::before {
+    content: "+";
+    color: #059669;
+    background: #ecfdf5;
+}
+
+.analise-movimentacoes>.card:nth-child(3) h2 {
+    color: #059669;
+}
+
+/* Unidades retiradas */
+
+.analise-movimentacoes>.card:nth-child(4) {
+    border-left: 4px solid #ef4444;
+}
+
+.analise-movimentacoes>.card:nth-child(4)::before {
+    content: "−";
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+.analise-movimentacoes>.card:nth-child(4) h2 {
+    color: #dc2626;
+}
+
+/* ==========================================
+   RESPONSIVIDADE
+========================================== */
+
+@media (max-width: 1200px) {
+    .analise-movimentacoes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .analise-movimentacoes {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .analise-movimentacoes>.card {
+        min-height: 165px;
+        padding: 22px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .analise-movimentacoes>.card {
+        transition: none;
+    }
+
+    .analise-movimentacoes>.card:hover {
+        transform: none;
+    }
+}
+/* ==========================================
+   SPRINT 06 - GRÁFICO DE MOVIMENTAÇÕES
+========================================== */
+
+.analise-grafico-secao {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    margin-top: 32px;
+    padding: 28px 30px;
+
+    background: linear-gradient(145deg,
+            #ffffff 0%,
+            #f9fbff 100%);
+
+    border: 1px solid #e5ebf3;
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, 0.025),
+        0 14px 32px rgba(15, 23, 42, 0.035);
+
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Detalhe decorativo superior */
+
+.analise-grafico-secao::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+
+    background: linear-gradient(90deg,
+            #10b981 0%,
+            #3b82f6 50%,
+            #ef4444 100%);
+}
+
+/* Cabeçalho */
+
+.analise-grafico-cabecalho {
+    margin-bottom: 28px;
+}
+
+.analise-grafico-cabecalho h2 {
+    margin: 0 0 7px;
+
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+
+    color: var(--text-primary);
+}
+
+.analise-grafico-cabecalho p {
+    margin: 0;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: var(--text-secondary);
+}
+
+/* Conteúdo */
+
+.analise-grafico-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.analise-grafico-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Legendas */
+
+.analise-grafico-legenda {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.analise-grafico-legenda span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.analise-grafico-legenda strong {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Cores dos valores */
+
+.analise-grafico-item:first-child .analise-grafico-legenda strong {
+    color: #059669;
+}
+
+.analise-grafico-item:last-child .analise-grafico-legenda strong {
+    color: #dc2626;
+}
+
+/* Trilhas */
+
+.analise-grafico-trilha {
+    width: 100%;
+    height: 18px;
+
+    background: #edf2f7;
+    border-radius: 999px;
+
+    overflow: hidden;
+}
+
+/* Barras */
+
+.analise-grafico-barra {
+    position: relative;
+    height: 100%;
+    width: 0%;
+
+    border-radius: 999px;
+
+    transition:
+        width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Entradas */
+
+.analise-grafico-barra.entrada {
+    background: linear-gradient(90deg,
+            #059669 0%,
+            #10b981 65%,
+            #34d399 100%);
+
+    box-shadow:
+        0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+/* Saídas */
+
+.analise-grafico-barra.saida {
+    background: linear-gradient(90deg,
+            #dc2626 0%,
+            #ef4444 65%,
+            #f87171 100%);
+
+    box-shadow:
+        0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+/* Reflexo discreto */
+
+.analise-grafico-barra::after {
+    content: "";
+    position: absolute;
+
+    top: 2px;
+    left: 8px;
+    right: 8px;
+
+    height: 4px;
+
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+}
+
+/* ==========================================
+   RESPONSIVIDADE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .analise-grafico-secao {
+        padding: 22px 20px;
+        margin-top: 24px;
+    }
+
+    .analise-grafico-cabecalho h2 {
+        font-size: 18px;
+    }
+
+    .analise-grafico-conteudo {
+        gap: 24px;
+    }
+
+    .analise-grafico-legenda strong {
+        font-size: 20px;
+    }
+
+    .analise-grafico-trilha {
+        height: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .analise-grafico-barra {
+        transition: none;
+    }
+
+}
+/* ==========================================
+   SPRINT 06 - IDENTIDADE DOS TÍTULOS
+========================================== */
+
+/* Títulos das seções */
+
+.analise-secao-titulo,
+.analise-grafico-cabecalho,
+.ranking-produtos-topo {
+    position: relative;
+}
+
+/* Títulos */
+
+.analise-secao-titulo h2,
+.analise-grafico-cabecalho h2,
+.ranking-produtos-topo h2 {
+    position: relative;
+
+    margin: 0 0 8px;
+    padding-left: 16px;
+
+    font-size: 20px;
+    font-weight: 750;
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+
+    color: #0f172a;
+}
+
+/* Detalhe azul ao lado dos títulos */
+
+.analise-secao-titulo h2::before,
+.analise-grafico-cabecalho h2::before,
+.ranking-produtos-topo h2::before {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    top: 4px;
+
+    width: 4px;
+    height: 19px;
+
+    background: linear-gradient(180deg,
+            #2563eb,
+            #60a5fa);
+
+    border-radius: 999px;
+}
+
+/* Subtítulos */
+
+.analise-secao-titulo p,
+.analise-grafico-cabecalho p,
+.ranking-produtos-topo p {
+    margin: 0;
+    padding-left: 16px;
+
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.6;
+
+    color: #64748b;
+}
+
+/* Espaçamento do resumo */
+
+.analise-secao-titulo {
+    margin-top: 44px;
+    margin-bottom: 20px;
+}
+
+/* Espaçamento do gráfico */
+
+.analise-grafico-cabecalho {
+    margin-bottom: 30px;
+}
+
+/* Cabeçalho do ranking */
+
+.ranking-produtos-topo {
+    padding: 26px 28px;
+}
+
+/* Responsividade */
+
+@media (max-width: 600px) {
+
+    .analise-secao-titulo h2,
+    .analise-grafico-cabecalho h2,
+    .ranking-produtos-topo h2 {
+        font-size: 18px;
+    }
+
+    .analise-secao-titulo {
+        margin-top: 32px;
+    }
+
+}
+/* ==========================================
+   SPRINT 06 - RANKING ANALÍTICO
+========================================== */
+
+/* Linhas do ranking */
+
+.ranking-produtos-tabela .ranking-linha {
+    transition: background-color 0.2s ease;
+}
+
+.ranking-produtos-tabela .ranking-linha:hover {
+    background-color: #f5f9ff;
+}
+
+/* Posição */
+
+.ranking-posicao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+
+    background: #f1f5f9;
+    color: #475569;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Primeiro colocado */
+
+.ranking-posicao-1 {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+/* Segundo colocado */
+
+.ranking-posicao-2 {
+    background: #e2e8f0;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
+/* Terceiro colocado */
+
+.ranking-posicao-3 {
+    background: #ffedd5;
+    color: #9a3412;
+    border-color: #fed7aa;
+}
+
+/* Nome do produto */
+
+.ranking-produto-nome {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* ==========================================
+   INDICADOR DE VOLUME
+========================================== */
+
+.ranking-volume {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+}
+
+.ranking-volume strong {
+    flex: 0 0 42px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Trilha */
+
+.ranking-volume-trilha {
+    flex: 1;
+    height: 9px;
+    min-width: 60px;
+
+    background: #edf2f7;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+/* Barra proporcional */
+
+.ranking-volume-barra {
+    height: 100%;
+    border-radius: 999px;
+
+    background: linear-gradient(90deg,
+            #2563eb 0%,
+            #60a5fa 100%);
+
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+
+    transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Destaque para o primeiro colocado */
+
+.ranking-linha:first-child .ranking-volume-barra {
+    background: linear-gradient(90deg,
+            #1d4ed8,
+            #3b82f6);
+}
+
+/* Distribuição das colunas */
+
+.ranking-produtos-tabela th:first-child,
+.ranking-produtos-tabela td:first-child {
+    width: 12%;
+}
+
+.ranking-produtos-tabela th:nth-child(2),
+.ranking-produtos-tabela td:nth-child(2) {
+    width: 34%;
+}
+
+.ranking-produtos-tabela th:nth-child(3),
+.ranking-produtos-tabela td:nth-child(3) {
+    width: 16%;
+}
+
+.ranking-produtos-tabela th:nth-child(4),
+.ranking-produtos-tabela td:nth-child(4) {
+    width: 38%;
+}
+
+/* Responsividade */
+
+@media (max-width: 768px) {
+
+    .ranking-produtos-tabela {
+        min-width: 700px;
+    }
+
+    .ranking-volume {
+        gap: 10px;
+    }
+
+    .ranking-volume strong {
+        flex-basis: 34px;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .ranking-volume-barra,
+    .ranking-produtos-tabela .ranking-linha {
+        transition: none;
+    }
+
+}
+/* ==========================================
+   SPRINT 06 - FILTRO MODERNO
+========================================== */
+
+.analise-cabecalho .analise-filtro-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    width: auto;
+    max-width: 100%;
+    padding: 20px 22px;
+
+    background: linear-gradient(145deg,
+            #ffffff,
+            #f9fbff);
+
+    border: 1px solid #e3eaf4;
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, 0.03),
+        0 12px 28px rgba(15, 23, 42, 0.04);
+
+    box-sizing: border-box;
+}
+
+/* Identidade do filtro */
+
+.analise-filtro-identidade {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.analise-filtro-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+}
+
+.analise-filtro-textos {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.analise-filtro-textos strong {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.analise-filtro-textos span {
+    font-size: 11px;
+    line-height: 1.4;
+    color: #64748b;
+}
+
+/* Organização dos campos */
+
+.analise-cabecalho .analise-filtro-container .analise-filtros-campos {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 10px;
+
+    width: 100%;
+}
+
+/* Mês e ano */
+
+.analise-cabecalho .analise-filtro-container .analise-filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    flex: 0 0 auto;
+    width: 135px;
+    min-width: 0;
+}
+
+.analise-cabecalho .analise-filtro-container .analise-filtro-grupo:nth-child(2) {
+    width: 95px;
+}
+
+/* Labels */
+
+.analise-cabecalho .analise-filtro-container .analise-filtro-grupo label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+}
+
+/* Campos */
+
+.analise-cabecalho .analise-filtro-container .analise-filtro-grupo select,
+.analise-cabecalho .analise-filtro-container .analise-filtro-grupo input {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+
+    background: #ffffff;
+    border: 1px solid #dce5f0;
+    border-radius: 9px;
+
+    color: #0f172a;
+    font-size: 13px;
+
+    outline: none;
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.analise-cabecalho .analise-filtro-container .analise-filtro-grupo select:focus,
+.analise-cabecalho .analise-filtro-container .analise-filtro-grupo input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Botão */
+
+.analise-cabecalho .analise-filtro-container #analiseAplicarFiltro {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+    min-width: 110px;
+    height: 42px;
+    padding: 0 16px;
+    margin: 0;
+
+    background: linear-gradient(135deg,
+            #2563eb,
+            #1d4ed8);
+
+    border: none;
+    border-radius: 9px;
+
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.analise-cabecalho .analise-filtro-container #analiseAplicarFiltro:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 15px rgba(37, 99, 235, 0.25);
+}
+
+/* Responsividade */
+
+@media (max-width: 1100px) {
+
+    .analise-cabecalho .analise-filtro-container {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .analise-cabecalho .analise-filtro-container {
+        padding: 18px;
+    }
+
+    .analise-cabecalho .analise-filtro-container .analise-filtros-campos {
+        flex-wrap: wrap;
+    }
+
+    .analise-cabecalho .analise-filtro-container .analise-filtro-grupo {
+        flex: 1 1 120px;
+        width: auto;
+    }
+
+    .analise-cabecalho .analise-filtro-container .analise-filtro-grupo:nth-child(2) {
+        width: auto;
+    }
+
+    .analise-cabecalho .analise-filtro-container #analiseAplicarFiltro {
+        width: 100%;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .analise-cabecalho .analise-filtro-container #analiseAplicarFiltro {
+        transition: none;
+    }
+
+    .analise-cabecalho .analise-filtro-container #analiseAplicarFiltro:hover {
+        transform: none;
+    }
+
+}
+/* ==========================================
+   SPRINT 06 - CABEÇALHO ANALÍTICO
+========================================== */
+
+.analise-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+/* Bloco do título */
+
+.analise-cabecalho>div:first-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    flex: 1 1 320px;
+    min-width: 0;
+    padding-top: 8px;
+}
+
+/* Título principal */
+
+.analise-cabecalho h1 {
+    position: relative;
+
+    margin: 0 0 12px;
+    padding-left: 20px;
+
+    font-size: clamp(25px, 2.2vw, 34px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.9px;
+
+    color: #0f172a;
+}
+
+/* Destaque lateral */
+
+.analise-cabecalho h1::before {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    top: 3px;
+
+    width: 5px;
+    height: 80%;
+
+    border-radius: 999px;
+
+    background: linear-gradient(180deg,
+            #2563eb,
+            #60a5fa);
+}
+
+/* Subtítulo */
+
+.analise-cabecalho>div:first-child>p {
+    margin: 0;
+    padding-left: 20px;
+
+    max-width: 520px;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #64748b;
+}
+
+/* Painel do filtro */
+
+.analise-cabecalho .analise-filtro-container {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+/* Aproximar indicadores do cabeçalho */
+
+.analise-cabecalho+.analise-indicadores {
+    margin-top: 0;
+}
+
+/* Responsividade */
+
+@media (max-width: 1050px) {
+
+    .analise-cabecalho {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .analise-cabecalho>div:first-child {
+        flex: 1 1 100%;
+    }
+
+    .analise-cabecalho .analise-filtro-container {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .analise-cabecalho {
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    .analise-cabecalho h1 {
+        font-size: 26px;
+    }
+
+    .analise-cabecalho>div:first-child>p {
+        font-size: 13px;
+    }
+
+}

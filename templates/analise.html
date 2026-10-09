@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block title %}
+Análise do Estoque | EasyStock
+{% endblock %}
+
+{% block conteudo %}
+
+<!-- ==========================================
+     CABEÇALHO E FILTRO POR PERÍODO
+========================================== -->
+
+<div class="pagina-cabecalho analise-cabecalho">
+
+    <div>
+        <h1>Análise do Estoque</h1>
+        <p>
+            Acompanhe os indicadores e o desempenho
+            do estoque do seu estabelecimento.
+        </p>
+    </div>
+
+    <div class="analise-filtro-container">
+    
+        <div class="analise-filtro-identidade">
+        
+            <span class="analise-filtro-icone" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M16 3v4M8 3v4M3 10h18" />
+                    <path d="m9 16 2 2 4-4" />
+                </svg>
+            </span>
+        
+            <div class="analise-filtro-textos">
+                <strong>Filtrar por período</strong>
+                <span>Consulte as movimentações por mês e ano</span>
+            </div>
+        
+        </div>
+
+    <div class="analise-filtros-campos">
+
+        <div class="analise-filtro-grupo">
+            <label for="analiseFiltroMes">Mês</label>
+
+            <select id="analiseFiltroMes">
+                <option value="1">Janeiro</option>
+                <option value="2">Fevereiro</option>
+                <option value="3">Março</option>
+                <option value="4">Abril</option>
+                <option value="5">Maio</option>
+                <option value="6">Junho</option>
+                <option value="7">Julho</option>
+                <option value="8">Agosto</option>
+                <option value="9">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+            </select>
+        </div>
+
+        <div class="analise-filtro-grupo">
+            <label for="analiseFiltroAno">Ano</label>
+
+            <input type="number" id="analiseFiltroAno" min="2020" max="2100" step="1">
+        </div>
+
+        <button type="button" id="analiseAplicarFiltro" class="btn-primary">
+            Aplicar filtro
+        </button>
+
+    </div>
+
+</div>
+</div>
+
+
+<!-- ==========================================
+     SPRINT 06 - INDICADORES DO ESTOQUE
+========================================== -->
+
+<section class="analise-indicadores">
+
+    <div class="card">
+        <h3>Valor estimado do estoque</h3>
+        <h2 id="analiseValorEstoque">R$ 0,00</h2>
+        <p>Preço cadastrado × quantidade disponível</p>
+    </div>
+
+    <div class="card">
+        <h3>Total de unidades</h3>
+        <h2 id="analiseTotalUnidades">0</h2>
+        <p>Unidades disponíveis no estoque</p>
+    </div>
+
+    <div class="card">
+        <h3>Produtos sem estoque</h3>
+        <h2 id="analiseSemEstoque">0</h2>
+        <p>Produtos com quantidade zerada</p>
+    </div>
+
+    <div class="card">
+        <h3>Produtos com estoque baixo</h3>
+        <h2 id="analiseEstoqueBaixo">0</h2>
+        <p>Produtos com 1 a 5 unidades</p>
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+     SPRINT 06 - RESUMO DAS MOVIMENTAÇÕES
+========================================== -->
+
+
+<div class="pagina-cabecalho analise-secao-titulo">
+    <div>
+        <h2>Resumo das Movimentações</h2>
+        <p>
+            Acompanhe as entradas e saídas registradas
+            no histórico do estoque.
+        </p>
+    </div>
+</div>
+
+<section class="analise-indicadores analise-movimentacoes">
+
+    <div class="card">
+        <h3>Total de entradas</h3>
+        <h2 id="analiseTotalEntradas">0</h2>
+        <p>Operações de entrada registradas</p>
+    </div>
+
+    <div class="card">
+        <h3>Total de saídas</h3>
+        <h2 id="analiseTotalSaidas">0</h2>
+        <p>Operações de saída registradas</p>
+    </div>
+
+    <div class="card">
+        <h3>Unidades recebidas</h3>
+        <h2 id="analiseUnidadesEntrada">0</h2>
+        <p>Quantidade total de unidades adicionadas</p>
+    </div>
+
+    <div class="card">
+        <h3>Unidades retiradas</h3>
+        <h2 id="analiseUnidadesSaida">0</h2>
+        <p>Quantidade total de unidades removidas</p>
+    </div>
+
+    
+</section>
+
+<!-- ==========================================
+     SPRINT 06 - GRÁFICO DE MOVIMENTAÇÕES
+========================================== -->
+
+<section class="analise-grafico-secao">
+
+    <div class="analise-grafico-cabecalho">
+        <div>
+            <h2>Fluxo de movimentações</h2>
+            <p>
+                Comparativo entre unidades recebidas
+                e retiradas do estoque.
+            </p>
+        </div>
+    </div>
+
+    <div class="analise-grafico-conteudo">
+
+        <div class="analise-grafico-item">
+
+            <div class="analise-grafico-legenda">
+                <span>Unidades recebidas</span>
+                <strong id="graficoValorEntradas">0</strong>
+            </div>
+
+            <div class="analise-grafico-trilha">
+                <div id="graficoBarraEntradas" class="analise-grafico-barra entrada" style="width: 0%;"></div>
+            </div>
+
+        </div>
+
+        <div class="analise-grafico-item">
+
+            <div class="analise-grafico-legenda">
+                <span>Unidades retiradas</span>
+                <strong id="graficoValorSaidas">0</strong>
+            </div>
+
+            <div class="analise-grafico-trilha">
+                <div id="graficoBarraSaidas" class="analise-grafico-barra saida" style="width: 0%;"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+     SPRINT 06 - RANKING DE PRODUTOS
+========================================== -->
+
+<section class="ranking-produtos-secao">
+
+    <div class="ranking-produtos-card">
+
+        <div class="ranking-produtos-topo">
+
+            <div>
+                <h2>Produtos mais movimentados</h2>
+                <p>
+                    Ranking por volume total de entradas
+                    e saídas registradas.
+                </p>
+            </div>
+
+            <span class="ranking-produtos-badge">
+                TOP 5
+            </span>
+
+        </div>
+
+        <div class="ranking-produtos-tabela-container">
+
+            <table class="ranking-produtos-tabela">
+
+                <thead>
+                    <tr>
+                        <th>Ranking</th>
+                        <th>Produto</th>
+                        <th>Operações</th>
+                        <th>Unidades movimentadas</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabelaProdutosMaisMovimentados">
+                    <tr>
+                        <td colspan="4">
+                            Carregando ranking...
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+     SPRINT 06 - CARREGAMENTO DOS DADOS
+========================================== -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        carregarIndicadoresEstoque();
+        carregarResumoMovimentacoes();
+        carregarProdutosMaisMovimentados();
+
+    });
+
+
+    /* ==========================================
+       INDICADORES DO ESTOQUE
+    ========================================== */
+
+    async function carregarIndicadoresEstoque() {
+
+        try {
+
+            const resposta = await fetch(
+                "/api/analise/indicadores"
+            );
+
+            if (!resposta.ok) {
+                throw new Error(
+                    "Não foi possível carregar os indicadores."
+                );
+            }
+
+            const dados = await resposta.json();
+
+            const formatarMoeda = new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+            });
+
+            const formatarNumero = new Intl.NumberFormat("pt-BR");
+
+            document.getElementById("analiseValorEstoque").textContent =
+                formatarMoeda.format(dados.valor_total_estoque ?? 0);
+
+            document.getElementById("analiseTotalUnidades").textContent =
+                formatarNumero.format(dados.total_unidades ?? 0);
+
+            document.getElementById("analiseSemEstoque").textContent =
+                formatarNumero.format(dados.produtos_sem_estoque ?? 0);
+
+            document.getElementById("analiseEstoqueBaixo").textContent =
+                formatarNumero.format(dados.produtos_estoque_baixo ?? 0);
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao carregar indicadores do estoque:",
+                erro
+            );
+
+        }
+
+    }
+
+
+    /* ==========================================
+       RESUMO DAS MOVIMENTAÇÕES
+    ========================================== */
+
+    async function carregarResumoMovimentacoes() {
+
+        try {
+
+            const resposta = await fetch(
+                "/api/analise/movimentacoes"
+            );
+
+            if (!resposta.ok) {
+                throw new Error(
+                    "Não foi possível carregar as movimentações."
+                );
+            }
+
+            const dados = await resposta.json();
+
+            const formatarNumero = new Intl.NumberFormat("pt-BR");
+
+            document.getElementById("analiseTotalEntradas").textContent =
+                formatarNumero.format(dados.total_entradas ?? 0);
+
+            document.getElementById("analiseTotalSaidas").textContent =
+                formatarNumero.format(dados.total_saidas ?? 0);
+
+            document.getElementById("analiseUnidadesEntrada").textContent =
+                formatarNumero.format(dados.unidades_entrada ?? 0);
+
+            document.getElementById("analiseUnidadesSaida").textContent =
+                formatarNumero.format(dados.unidades_saida ?? 0);
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao carregar resumo das movimentações:",
+                erro
+            );
+
+        }
+
+    }
+
+
+    /* ==========================================
+       PRODUTOS MAIS MOVIMENTADOS
+    ========================================== */
+
+    async function carregarProdutosMaisMovimentados() {
+
+        const tabela = document.getElementById(
+            "tabelaProdutosMaisMovimentados"
+        );
+
+        if (!tabela) return;
+
+        try {
+
+            const resposta = await fetch(
+                "/api/analise/produtos-mais-movimentados"
+            );
+
+            if (!resposta.ok) {
+                throw new Error(
+                    "Não foi possível carregar o ranking."
+                );
+            }
+
+            const produtos = await resposta.json();
+
+            tabela.innerHTML = "";
+
+            if (produtos.length === 0) {
+
+                const linha = tabela.insertRow();
+                const celula = linha.insertCell();
+
+                celula.colSpan = 4;
+                celula.textContent =
+                    "Nenhuma movimentação registrada até o momento.";
+
+                return;
+            }
+
+            const formatarNumero = new Intl.NumberFormat("pt-BR");
+
+           
+            const maiorVolume = Math.max(
+                1,
+                ...produtos.map(
+                    produto => Number(produto.unidades_movimentadas) || 0
+                )
+            );
+
+            produtos.forEach((produto, indice) => {
+
+                const linha = tabela.insertRow();
+                linha.classList.add("ranking-linha");
+
+                const posicao = linha.insertCell();
+                const nome = linha.insertCell();
+                const operacoes = linha.insertCell();
+                const unidades = linha.insertCell();
+
+                // Posição no ranking
+                const marcador = document.createElement("span");
+                marcador.className = "ranking-posicao";
+
+                if (indice < 3) {
+                    marcador.classList.add(
+                        `ranking-posicao-${indice + 1}`
+                    );
+                }
+
+                marcador.textContent = String(indice + 1).padStart(2, "0");
+                posicao.appendChild(marcador);
+
+                // Nome do produto
+                nome.textContent =
+                    produto.nome || "Produto não identificado";
+
+                nome.classList.add("ranking-produto-nome");
+
+                // Total de operações
+                operacoes.textContent = new Intl.NumberFormat("pt-BR")
+                    .format(produto.total_operacoes ?? 0);
+
+                // Quantidade e barra proporcional
+                const quantidade = Number(
+                    produto.unidades_movimentadas
+                ) || 0;
+
+                const percentual = Math.max(
+                    0,
+                    Math.min(100, (quantidade / maiorVolume) * 100)
+                );
+
+                const conteudo = document.createElement("div");
+                conteudo.className = "ranking-volume";
+
+                const valor = document.createElement("strong");
+                valor.textContent = new Intl.NumberFormat("pt-BR")
+                    .format(quantidade);
+
+                const trilha = document.createElement("div");
+                trilha.className = "ranking-volume-trilha";
+
+                const barra = document.createElement("div");
+                barra.className = "ranking-volume-barra";
+                barra.style.width = `${percentual}%`;
+
+                trilha.appendChild(barra);
+                conteudo.appendChild(valor);
+                conteudo.appendChild(trilha);
+                unidades.appendChild(conteudo);
+
+            });
+
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao carregar ranking:",
+                erro
+            );
+
+            tabela.innerHTML = "";
+
+            const linha = tabela.insertRow();
+            const celula = linha.insertCell();
+
+            celula.colSpan = 4;
+            celula.textContent =
+                "Não foi possível carregar o ranking de produtos.";
+
+        }
+
+    }
+
+</script>
+
+{% endblock %}
