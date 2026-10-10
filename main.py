@@ -1277,11 +1277,19 @@ def pagina_historico():
 # SPRINT 06
 # ==============================
 
+# ==============================
+# PÁGINA DE ANÁLISE DO ESTOQUE
+# SPRINT 06 - ACESSO ADMIN
+# ==============================
+
 @app.route("/analise")
 def pagina_analise():
 
     if "usuario_id" not in session:
         return redirect("/login")
+
+    if not usuario_tem_perfil("Administrador"):
+        return redirect("/")
 
     return render_template(
         "analise.html",
@@ -1298,7 +1306,10 @@ def indicadores_estoque():
         return jsonify({
             "erro": "Usuário não autenticado."
         }), 401
-
+    if not usuario_tem_perfil("Administrador"):
+        return jsonify({
+        "erro": "Acesso permitido apenas para administradores."
+    }), 403
     conn = conectar_banco()
 
     indicadores = conn.execute("""
@@ -1340,91 +1351,163 @@ def analise_movimentacoes():
         return jsonify({
             "erro": "Usuário não autenticado."
         }), 401
+    if not usuario_tem_perfil("Administrador"):
+        return jsonify({
+        "erro": "Acesso permitido apenas para administradores."
+    }), 403
+    mes = request.args.get("mes", type=int)
+    ano = request.args.get("ano", type=int)
+
+    if (mes is None) != (ano is None):
+        return jsonify({
+            "erro": "Informe mês e ano juntos."
+        }), 400
+
+    if mes is not None and (
+        mes < 1 or mes > 12 or ano < 2020 or ano > 2100
+    ):
+        return jsonify({
+            "erro": "Período inválido."
+        }), 400
+
+    filtros = []
+    parametros = []
+
+    if mes is not None:
+        filtros.append(
+            "strftime('%Y-%m', data_hora) = ?"
+        )
+        parametros.append(f"{ano:04d}-{mes:02d}")
+
+    where_sql = (
+        "WHERE " + " AND ".join(filtros)
+        if filtros else ""
+    )
 
     conn = conectar_banco()
 
-    resumo = conn.execute("""
-        SELECT
-            COALESCE(SUM(
-                CASE WHEN tipo = 'entrada'
-                THEN 1 ELSE 0 END
-            ), 0) AS total_entradas,
+    try:
+        resumo = conn.execute(f"""
+            SELECT
+                COALESCE(SUM(
+                    CASE WHEN tipo = 'entrada'
+                    THEN 1 ELSE 0 END
+                ), 0) AS total_entradas,
 
-            COALESCE(SUM(
-                CASE WHEN tipo = 'saida'
-                THEN 1 ELSE 0 END
-            ), 0) AS total_saidas,
+                COALESCE(SUM(
+                    CASE WHEN tipo = 'saida'
+                    THEN 1 ELSE 0 END
+                ), 0) AS total_saidas,
 
-            COALESCE(SUM(
-                CASE WHEN tipo = 'entrada'
-                THEN quantidade ELSE 0 END
-            ), 0) AS unidades_entrada,
+                COALESCE(SUM(
+                    CASE WHEN tipo = 'entrada'
+                    THEN quantidade ELSE 0 END
+                ), 0) AS unidades_entrada,
 
-            COALESCE(SUM(
-                CASE WHEN tipo = 'saida'
-                THEN quantidade ELSE 0 END
-            ), 0) AS unidades_saida
+                COALESCE(SUM(
+                    CASE WHEN tipo = 'saida'
+                    THEN quantidade ELSE 0 END
+                ), 0) AS unidades_saida
 
-        FROM movimentacoes
-    """).fetchone()
+            FROM movimentacoes
 
-    conn.close()
+            {where_sql}
+        """, parametros).fetchone()
 
-    return jsonify(dict(resumo)), 200
+        return jsonify(dict(resumo)), 200
+
+    finally:
+        conn.close()
 
 
 # ==========================================
 # SPRINT 06 - PRODUTOS MAIS MOVIMENTADOS
 # ==========================================
 
-@app.route("/api/analise/produtos-mais-movimentados", methods=["GET"])
+@app.route(
+    "/api/analise/produtos-mais-movimentados",
+    methods=["GET"]
+)
 def produtos_mais_movimentados():
 
     if "usuario_id" not in session:
         return jsonify({
             "erro": "Usuário não autenticado."
         }), 401
+    if not usuario_tem_perfil("Administrador"):
+     return jsonify({
+        "erro": "Acesso permitido apenas para administradores."
+    }), 403
+    mes = request.args.get("mes", type=int)
+    ano = request.args.get("ano", type=int)
+
+    if (mes is None) != (ano is None):
+        return jsonify({
+            "erro": "Informe mês e ano juntos."
+        }), 400
+
+    if mes is not None and (
+        mes < 1 or mes > 12 or ano < 2020 or ano > 2100
+    ):
+        return jsonify({
+            "erro": "Período inválido."
+        }), 400
+
+    filtros = [
+        "tipo IN ('entrada', 'saida')"
+    ]
+    parametros = []
+
+    if mes is not None:
+        filtros.append(
+            "strftime('%Y-%m', data_hora) = ?"
+        )
+        parametros.append(f"{ano:04d}-{mes:02d}")
+
+    where_sql = "WHERE " + " AND ".join(filtros)
 
     conn = conectar_banco()
 
-    produtos = conn.execute("""
-        SELECT
-            produto_id,
-            COALESCE(
-                produto_nome,
-                'Produto não identificado'
-            ) AS nome,
+    try:
+        produtos = conn.execute(f"""
+            SELECT
+                produto_id,
 
-            COUNT(*) AS total_operacoes,
+                COALESCE(
+                    produto_nome,
+                    'Produto não identificado'
+                ) AS nome,
 
-            COALESCE(
-                SUM(quantidade),
-                0
-            ) AS unidades_movimentadas
+                COUNT(*) AS total_operacoes,
 
-        FROM movimentacoes
+                COALESCE(
+                    SUM(quantidade),
+                    0
+                ) AS unidades_movimentadas
 
-        WHERE tipo IN ('entrada', 'saida')
+            FROM movimentacoes
 
-        GROUP BY
-            produto_id,
-            produto_nome
+            {where_sql}
 
-        ORDER BY
-            unidades_movimentadas DESC,
-            total_operacoes DESC,
-            nome ASC
+            GROUP BY
+                produto_id,
+                produto_nome
 
-        LIMIT 5
-    """).fetchall()
+            ORDER BY
+                unidades_movimentadas DESC,
+                total_operacoes DESC,
+                nome ASC
 
-    conn.close()
+            LIMIT 5
+        """, parametros).fetchall()
 
-    return jsonify([
-        dict(produto)
-        for produto in produtos
-    ]), 200
+        return jsonify([
+            dict(produto)
+            for produto in produtos
+        ]), 200
 
+    finally:
+        conn.close()
 @app.route("/usuarios")
 def pagina_usuarios():
 

@@ -6,13 +6,10 @@ Análise do Estoque | EasyStock
 
 {% block conteudo %}
 
-<!-- ==========================================
-     CABEÇALHO E FILTRO POR PERÍODO
-========================================== -->
-
+<!-- CABEÇALHO E FILTRO -->
 <div class="pagina-cabecalho analise-cabecalho">
 
-    <div>
+    <div class="analise-cabecalho-textos">
         <h1>Análise do Estoque</h1>
         <p>
             Acompanhe os indicadores e o desempenho
@@ -21,9 +18,8 @@ Análise do Estoque | EasyStock
     </div>
 
     <div class="analise-filtro-container">
-    
+
         <div class="analise-filtro-identidade">
-        
             <span class="analise-filtro-icone" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -32,55 +28,61 @@ Análise do Estoque | EasyStock
                     <path d="m9 16 2 2 4-4" />
                 </svg>
             </span>
-        
+
             <div class="analise-filtro-textos">
                 <strong>Filtrar por período</strong>
                 <span>Consulte as movimentações por mês e ano</span>
             </div>
-        
         </div>
 
-    <div class="analise-filtros-campos">
-
-        <div class="analise-filtro-grupo">
-            <label for="analiseFiltroMes">Mês</label>
-
-            <select id="analiseFiltroMes">
-                <option value="1">Janeiro</option>
-                <option value="2">Fevereiro</option>
-                <option value="3">Março</option>
-                <option value="4">Abril</option>
-                <option value="5">Maio</option>
-                <option value="6">Junho</option>
-                <option value="7">Julho</option>
-                <option value="8">Agosto</option>
-                <option value="9">Setembro</option>
-                <option value="10">Outubro</option>
-                <option value="11">Novembro</option>
-                <option value="12">Dezembro</option>
-            </select>
+        <div class="analise-periodo-status">
+            <span class="analise-periodo-ponto"></span>
+            <span id="analisePeriodoAtivo">
+                Exibindo movimentações de todos os períodos
+            </span>
         </div>
 
-        <div class="analise-filtro-grupo">
-            <label for="analiseFiltroAno">Ano</label>
+        <div class="analise-filtros-campos">
 
-            <input type="number" id="analiseFiltroAno" min="2020" max="2100" step="1">
+            <div class="analise-filtro-grupo">
+                <label for="analiseFiltroMes">Mês</label>
+                <select id="analiseFiltroMes">
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                </select>
+            </div>
+
+            <div class="analise-filtro-grupo">
+                <label for="analiseFiltroAno">Ano</label>
+                <input type="number" id="analiseFiltroAno" min="2020" max="2100" step="1">
+            </div>
+
+            <button type="button" id="analiseAplicarFiltro" class="btn-primary">
+                Aplicar filtro
+            </button>
+
+            <button type="button" id="analiseLimparFiltro" class="btn btn-secundario">
+                Limpar filtro
+            </button>
+
         </div>
-
-        <button type="button" id="analiseAplicarFiltro" class="btn-primary">
-            Aplicar filtro
-        </button>
-
     </div>
 
 </div>
-</div>
+<!-- FIM DO CABEÇALHO: fechamento corrigido -->
 
 
-<!-- ==========================================
-     SPRINT 06 - INDICADORES DO ESTOQUE
-========================================== -->
-
+<!-- INDICADORES DO ESTOQUE -->
 <section class="analise-indicadores">
 
     <div class="card">
@@ -110,11 +112,7 @@ Análise do Estoque | EasyStock
 </section>
 
 
-<!-- ==========================================
-     SPRINT 06 - RESUMO DAS MOVIMENTAÇÕES
-========================================== -->
-
-
+<!-- RESUMO DAS MOVIMENTAÇÕES -->
 <div class="pagina-cabecalho analise-secao-titulo">
     <div>
         <h2>Resumo das Movimentações</h2>
@@ -151,13 +149,10 @@ Análise do Estoque | EasyStock
         <p>Quantidade total de unidades removidas</p>
     </div>
 
-    
 </section>
 
-<!-- ==========================================
-     SPRINT 06 - GRÁFICO DE MOVIMENTAÇÕES
-========================================== -->
 
+<!-- GRÁFICO DE MOVIMENTAÇÕES -->
 <section class="analise-grafico-secao">
 
     <div class="analise-grafico-cabecalho">
@@ -203,16 +198,12 @@ Análise do Estoque | EasyStock
 </section>
 
 
-<!-- ==========================================
-     SPRINT 06 - RANKING DE PRODUTOS
-========================================== -->
-
+<!-- RANKING DE PRODUTOS -->
 <section class="ranking-produtos-secao">
 
     <div class="ranking-produtos-card">
 
         <div class="ranking-produtos-topo">
-
             <div>
                 <h2>Produtos mais movimentados</h2>
                 <p>
@@ -224,7 +215,6 @@ Análise do Estoque | EasyStock
             <span class="ranking-produtos-badge">
                 TOP 5
             </span>
-
         </div>
 
         <div class="ranking-produtos-tabela-container">
@@ -251,38 +241,91 @@ Análise do Estoque | EasyStock
             </table>
 
         </div>
-
     </div>
 
 </section>
 
 
-<!-- ==========================================
-     SPRINT 06 - CARREGAMENTO DOS DADOS
-========================================== -->
-
+<!-- JAVASCRIPT -->
 <script>
 
+    let periodoAnalise = "";
+
     document.addEventListener("DOMContentLoaded", function () {
+
+        const campoMes = document.getElementById("analiseFiltroMes");
+        const campoAno = document.getElementById("analiseFiltroAno");
+        const botaoFiltro = document.getElementById("analiseAplicarFiltro");
+        const botaoLimparFiltro = document.getElementById("analiseLimparFiltro");
+        const periodoAtivo = document.getElementById("analisePeriodoAtivo");
+
+        const dataAtual = new Date();
+
+        campoMes.value = String(dataAtual.getMonth() + 1);
+        campoAno.value = String(dataAtual.getFullYear());
 
         carregarIndicadoresEstoque();
         carregarResumoMovimentacoes();
         carregarProdutosMaisMovimentados();
 
+        // APLICAR FILTRO
+        botaoFiltro.addEventListener("click", function () {
+
+            const mes = Number(campoMes.value);
+            const ano = Number(campoAno.value);
+
+            if (
+                !Number.isInteger(mes) ||
+                mes < 1 ||
+                mes > 12 ||
+                !Number.isInteger(ano) ||
+                ano < 2020 ||
+                ano > 2100
+            ) {
+                alert("Selecione um mês e um ano válidos.");
+                return;
+            }
+
+            periodoAnalise = `?mes=${mes}&ano=${ano}`;
+
+            const nomeMes =
+                campoMes.options[campoMes.selectedIndex].text;
+
+            periodoAtivo.textContent =
+                `Exibindo movimentações de ${nomeMes} de ${ano}`;
+
+            carregarResumoMovimentacoes();
+            carregarProdutosMaisMovimentados();
+
+        });
+
+        // LIMPAR FILTRO
+        botaoLimparFiltro.addEventListener("click", function () {
+
+            periodoAnalise = "";
+
+            periodoAtivo.textContent =
+                "Exibindo movimentações de todos os períodos";
+
+            const hoje = new Date();
+
+            campoMes.value = String(hoje.getMonth() + 1);
+            campoAno.value = String(hoje.getFullYear());
+
+            carregarResumoMovimentacoes();
+            carregarProdutosMaisMovimentados();
+
+        });
+
     });
 
 
-    /* ==========================================
-       INDICADORES DO ESTOQUE
-    ========================================== */
-
+    // INDICADORES DO ESTOQUE
     async function carregarIndicadoresEstoque() {
 
         try {
 
-            const resposta = await fetch(
-                "/api/analise/indicadores"
-            );
+            const resposta = await fetch("/api/analise/indicadores");
 
             if (!resposta.ok) {
                 throw new Error(
@@ -323,16 +366,13 @@ Análise do Estoque | EasyStock
     }
 
 
-    /* ==========================================
-       RESUMO DAS MOVIMENTAÇÕES
-    ========================================== */
-
+    // RESUMO DAS MOVIMENTAÇÕES
     async function carregarResumoMovimentacoes() {
 
         try {
 
             const resposta = await fetch(
-                "/api/analise/movimentacoes"
+                `/api/analise/movimentacoes${periodoAnalise}`
             );
 
             if (!resposta.ok) {
@@ -342,7 +382,6 @@ Análise do Estoque | EasyStock
             }
 
             const dados = await resposta.json();
-
             const formatarNumero = new Intl.NumberFormat("pt-BR");
 
             document.getElementById("analiseTotalEntradas").textContent =
@@ -357,6 +396,34 @@ Análise do Estoque | EasyStock
             document.getElementById("analiseUnidadesSaida").textContent =
                 formatarNumero.format(dados.unidades_saida ?? 0);
 
+            // ATUALIZAR GRÁFICO
+            const unidadesEntrada = Number(dados.unidades_entrada) || 0;
+            const unidadesSaida = Number(dados.unidades_saida) || 0;
+
+            document.getElementById("graficoValorEntradas").textContent =
+                formatarNumero.format(unidadesEntrada);
+
+            document.getElementById("graficoValorSaidas").textContent =
+                formatarNumero.format(unidadesSaida);
+
+            const maiorValor = Math.max(
+                unidadesEntrada,
+                unidadesSaida,
+                1
+            );
+
+            const percentualEntrada =
+                (unidadesEntrada / maiorValor) * 100;
+
+            const percentualSaida =
+                (unidadesSaida / maiorValor) * 100;
+
+            document.getElementById("graficoBarraEntradas").style.width =
+                `${percentualEntrada}%`;
+
+            document.getElementById("graficoBarraSaidas").style.width =
+                `${percentualSaida}%`;
+
         } catch (erro) {
 
             console.error(
@@ -369,10 +436,7 @@ Análise do Estoque | EasyStock
     }
 
 
-    /* ==========================================
-       PRODUTOS MAIS MOVIMENTADOS
-    ========================================== */
-
+    // PRODUTOS MAIS MOVIMENTADOS
     async function carregarProdutosMaisMovimentados() {
 
         const tabela = document.getElementById(
@@ -384,7 +448,7 @@ Análise do Estoque | EasyStock
         try {
 
             const resposta = await fetch(
-                "/api/analise/produtos-mais-movimentados"
+                `/api/analise/produtos-mais-movimentados${periodoAnalise}`
             );
 
             if (!resposta.ok) {
@@ -404,18 +468,18 @@ Análise do Estoque | EasyStock
 
                 celula.colSpan = 4;
                 celula.textContent =
-                    "Nenhuma movimentação registrada até o momento.";
+                    "Nenhuma movimentação encontrada para o período.";
 
                 return;
             }
 
             const formatarNumero = new Intl.NumberFormat("pt-BR");
 
-           
             const maiorVolume = Math.max(
                 1,
                 ...produtos.map(
-                    produto => Number(produto.unidades_movimentadas) || 0
+                    produto =>
+                        Number(produto.unidades_movimentadas) || 0
                 )
             );
 
@@ -429,7 +493,7 @@ Análise do Estoque | EasyStock
                 const operacoes = linha.insertCell();
                 const unidades = linha.insertCell();
 
-                // Posição no ranking
+                // POSIÇÃO
                 const marcador = document.createElement("span");
                 marcador.className = "ranking-posicao";
 
@@ -439,35 +503,39 @@ Análise do Estoque | EasyStock
                     );
                 }
 
-                marcador.textContent = String(indice + 1).padStart(2, "0");
+                marcador.textContent =
+                    String(indice + 1).padStart(2, "0");
+
                 posicao.appendChild(marcador);
 
-                // Nome do produto
+                // PRODUTO
                 nome.textContent =
                     produto.nome || "Produto não identificado";
 
                 nome.classList.add("ranking-produto-nome");
 
-                // Total de operações
-                operacoes.textContent = new Intl.NumberFormat("pt-BR")
-                    .format(produto.total_operacoes ?? 0);
+                // OPERAÇÕES
+                operacoes.textContent =
+                    formatarNumero.format(produto.total_operacoes ?? 0);
 
-                // Quantidade e barra proporcional
-                const quantidade = Number(
-                    produto.unidades_movimentadas
-                ) || 0;
+                // VOLUME
+                const quantidade =
+                    Number(produto.unidades_movimentadas) || 0;
 
                 const percentual = Math.max(
                     0,
-                    Math.min(100, (quantidade / maiorVolume) * 100)
+                    Math.min(
+                        100,
+                        (quantidade / maiorVolume) * 100
+                    )
                 );
 
                 const conteudo = document.createElement("div");
                 conteudo.className = "ranking-volume";
 
                 const valor = document.createElement("strong");
-                valor.textContent = new Intl.NumberFormat("pt-BR")
-                    .format(quantidade);
+                valor.textContent =
+                    formatarNumero.format(quantidade);
 
                 const trilha = document.createElement("div");
                 trilha.className = "ranking-volume-trilha";
@@ -482,7 +550,6 @@ Análise do Estoque | EasyStock
                 unidades.appendChild(conteudo);
 
             });
-
 
         } catch (erro) {
 

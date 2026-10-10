@@ -61,12 +61,17 @@
                 Histórico
             </a>
 
-            <!-- SPRINT 06 - ANÁLISE DO ESTOQUE -->
-            
-            <a href="/analise" class="sidebar-item {% if pagina_ativa == 'analise' %}ativo{% endif %}">
-                <span>▥</span>
-                Análise do Estoque
-            </a>
+        <!-- SPRINT 06 - ANÁLISE DO ESTOQUE -->
+        <!-- Acesso exclusivo do Administrador -->
+        
+        {% if session.get("perfil") == "Administrador" %}
+        
+        <a href="/analise" class="sidebar-item {% if pagina_ativa == 'analise' %}ativo{% endif %}">
+            <span>▥</span>
+            Análise do Estoque
+        </a>
+        
+        {% endif %}
 
             {% if session.get("perfil") == "Administrador" %}
 
