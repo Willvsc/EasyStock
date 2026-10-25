@@ -150,9 +150,88 @@
 
     </div>
 
+    <!-- SPRINT 07 - NOTIFICAÇÃO DE BOAS-VINDAS -->
+    
+    <div id="toastBoasVindas" class="toast-boas-vindas" role="status" aria-live="polite" aria-atomic="true" hidden>
+        <div class="toast-boas-vindas-icone">
+            ✓
+        </div>
+    
+        <div class="toast-boas-vindas-conteudo">
+            <strong id="toastNome"></strong>
+    
+            <p>Acesso realizado com sucesso.</p>
+    
+            <span id="toastPerfil"></span>
+        </div>
+    
+        <button type="button" id="toastFechar" class="toast-boas-vindas-fechar" aria-label="Fechar notificação">
+            ×
+        </button>
+    
+        <div class="toast-boas-vindas-progresso"></div>
+    </div>
+    
+    <script id="dadosUsuario" type="application/json">
+    {
+        "nome": {{ session.get("usuario_nome", "Usuário") | tojson }},
+        "perfil": {{ session.get("perfil", "") | tojson }}
+    }
+    </script>
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const deveMostrar =
+                sessionStorage.getItem("easyStockBoasVindas");
+
+            if (deveMostrar !== "1") return;
+
+            sessionStorage.removeItem("easyStockBoasVindas");
+
+            const toast = document.getElementById("toastBoasVindas");
+            const nome = document.getElementById("toastNome");
+            const perfil = document.getElementById("toastPerfil");
+            const fechar = document.getElementById("toastFechar");
+
+            const dadosUsuario = document.getElementById("dadosUsuario");
+
+            if (!toast || !dadosUsuario) return;
+
+            const usuario = JSON.parse(dadosUsuario.textContent);
+
+            nome.textContent =
+                `Bem-vindo, ${usuario.nome}! 👋`;
+
+            perfil.textContent = usuario.perfil;
+
+            toast.hidden = false;
+
+            requestAnimationFrame(() => {
+                toast.classList.add("toast-visivel");
+            });
+
+            let temporizador;
+
+            function fecharToast() {
+
+                clearTimeout(temporizador);
+
+                toast.classList.remove("toast-visivel");
+
+                setTimeout(() => {
+                    toast.hidden = true;
+                }, 350);
+            }
+
+            fechar.addEventListener("click", fecharToast);
+
+            temporizador = setTimeout(fecharToast, 5500);
+
+        });
+    </script>
 </body>
 
 </html>

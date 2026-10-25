@@ -2685,12 +2685,16 @@ def excluir_categoria(categoria_id):
 # HISTÓRICO DE MOVIMENTAÇÕES
 # ==============================
 
+
+# ==============================
+# HISTÓRICO DE MOVIMENTAÇÕES
+# ==============================
+
 @app.route(
     "/api/movimentacoes",
     methods=["GET"]
 )
 def listar_movimentacoes():
-
 
     if "usuario_id" not in session:
 
@@ -2698,40 +2702,53 @@ def listar_movimentacoes():
             "erro": "Usuário não autenticado."
         }), 401
 
-
     conn = conectar_banco()
 
+    try:
 
-    movimentacoes = conn.execute("""
-        SELECT
-            movimentacoes.id,
-            movimentacoes.produto_id,
-            movimentacoes.produto_nome,
-            movimentacoes.tipo,
-            movimentacoes.quantidade,
-            movimentacoes.data_hora,
-            movimentacoes.usuario_id,
-            movimentacoes.valor_unitario,
-            movimentacoes.valor_total,
-            usuario.nome AS usuario_nome
+        movimentacoes = conn.execute("""
+            SELECT
+                movimentacoes.id,
+                movimentacoes.produto_id,
+                movimentacoes.produto_nome,
+                movimentacoes.tipo,
+                movimentacoes.quantidade,
+                movimentacoes.data_hora,
+                movimentacoes.usuario_id,
+                movimentacoes.valor_unitario,
+                movimentacoes.valor_total,
 
-        FROM movimentacoes
+                usuario.nome AS usuario_nome,
 
-        LEFT JOIN usuario
-            ON usuario.id =
-               movimentacoes.usuario_id
+                produtos.categoria_id AS categoria_id,
+                categorias.nome AS categoria
 
-        ORDER BY movimentacoes.id DESC
-    """).fetchall()
+            FROM movimentacoes
 
+            LEFT JOIN usuario
+                ON usuario.id =
+                   movimentacoes.usuario_id
 
-    conn.close()
+            LEFT JOIN produtos
+                ON produtos.id =
+                   movimentacoes.produto_id
 
+            LEFT JOIN categorias
+                ON categorias.id =
+                   produtos.categoria_id
 
-    return jsonify([
-        dict(movimentacao)
-        for movimentacao in movimentacoes
-    ])
+            ORDER BY movimentacoes.id DESC
+        """).fetchall()
+
+        return jsonify([
+            dict(movimentacao)
+            for movimentacao in movimentacoes
+        ])
+
+    finally:
+
+        conn.close()
+
 ## ==============================
 # RELATÓRIO MENSAL DE MOVIMENTAÇÕES
 # ==============================

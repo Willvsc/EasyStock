@@ -305,13 +305,13 @@ function renderizarProdutos() {
             statusClasse = "status-critico";
             linhaClasse = "linha-critica";
 
-        } else if (produto.quantidade < 5) {
-
+        } else if (Number(produto.quantidade) <= 5) {
             statusTexto = "Estoque baixo";
             statusClasse = "status-alerta";
             linhaClasse = "linha-alerta";
 
-        } else {
+
+        }  else {
 
             statusTexto = "Estoque normal";
             statusClasse = "status-ok";
@@ -1593,13 +1593,10 @@ function atualizarDashboard() {
                 quantidadeSemEstoque++;
 
             } else if (
-                quantidade < 5
-            ) {
-
-                quantidadeEstoqueBaixo++;
-
-            }
-
+    quantidade <= 5
+) {
+    quantidadeEstoqueBaixo++;
+}
         }
     );
 
@@ -1654,6 +1651,8 @@ const filtroCategoriaHistorico =
 // =========================================================
 // CARREGAR MOVIMENTAÇÕES
 // =========================================================
+
+let movimentacoesHistoricoFiltradas = [];
 
 async function carregarMovimentacoes() {
 
@@ -2070,7 +2069,10 @@ async function carregarMovimentacoes() {
                 }
             );
 
+        // Guardar exatamente as movimentações
+// que passaram pelos filtros do histórico.
 
+movimentacoesHistoricoFiltradas = movimentacoesFiltradas;
         // =================================================
         // LIMPAR TABELA
         // =================================================
@@ -2353,6 +2355,163 @@ if (btnLimparFiltros) {
     );
 
 }
+
+// ==========================================
+// EXPORTAR HISTÓRICO FILTRADO EM CSV
+// ==========================================
+
+function exportarHistoricoCSV() {
+
+    const movimentacoes =
+        movimentacoesHistoricoFiltradas;
+
+    if (movimentacoes.length === 0) {
+
+    mostrarMensagem(
+        "Não existem movimentações para exportar.",
+        "erro"
+    );
+
+    return;
+}
+
+    // Evita que vírgulas, aspas ou quebras
+    // de linha danifiquem o arquivo CSV.
+    // Também impede interpretação de texto
+    // como fórmula ao abrir no Excel.
+
+    function campoCSV(valor) {
+
+        let texto = String(valor ?? "");
+
+        if (/^[\s]*[=+\-@\t\r]/.test(texto)) {
+            texto = "'" + texto;
+        }
+
+        return '"' +
+            texto.replace(/"/g, '""') +
+            '"';
+
+    }
+
+    // Cabeçalho do arquivo
+
+    const linhas = [
+
+        [
+            "Produto",
+            "Categoria",
+            "Tipo",
+            "Quantidade",
+            "Data e hora",
+            "Usuário"
+        ]
+
+    ];
+
+    // Movimentações filtradas
+
+    movimentacoes.forEach(movimentacao => {
+
+        const dataOriginal =
+            movimentacao.data_hora || "";
+
+        const data = new Date(
+            dataOriginal.replace(" ", "T")
+        );
+
+        const dataFormatada =
+            Number.isNaN(data.getTime())
+                ? dataOriginal
+                : data.toLocaleString("pt-BR");
+
+        linhas.push([
+
+            movimentacao.produto_nome ||
+                "Produto removido",
+
+            movimentacao.categoria || "—",
+
+            movimentacao.tipo === "entrada"
+                ? "Entrada"
+                : "Saída",
+
+            movimentacao.quantidade,
+
+            dataFormatada,
+
+            movimentacao.usuario_nome || "—"
+
+        ]);
+
+    });
+
+    // Montar CSV com separador ponto e vírgula,
+    // compatível com o Excel em português.
+
+    const conteudoCSV = linhas
+        .map(linha =>
+            linha.map(campoCSV).join(";")
+        )
+        .join("\r\n");
+
+    // BOM UTF-8 para preservar acentos no Excel.
+
+    const arquivo = new Blob(
+        ["\uFEFF", conteudoCSV],
+        {
+            type: "text/csv;charset=utf-8;"
+        }
+    );
+
+    const url = URL.createObjectURL(arquivo);
+
+    const link = document.createElement("a");
+
+    const dataAtual = new Date()
+        .toISOString()
+        .slice(0, 10);
+
+    link.href = url;
+
+    link.download =
+        `EasyStock_Historico_${dataAtual}.csv`;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
+
+    mostrarMensagem(
+    "Histórico exportado em CSV com sucesso!",
+    "sucesso"
+);
+}
+
+
+// ==========================================
+// EVENTO DO BOTÃO EXPORTAR CSV
+// ==========================================
+
+const btnExportarHistoricoCSV =
+    document.getElementById(
+        "btnExportarHistoricoCSV"
+    );
+
+if (btnExportarHistoricoCSV) {
+
+    btnExportarHistoricoCSV.addEventListener(
+        "click",
+        exportarHistoricoCSV
+    );
+
+}
+
 // ==============================
 // RELATÓRIO MENSAL DO HISTÓRICO
 // SOMENTE ADMINISTRADOR
@@ -5677,16 +5836,24 @@ if (btnConfirmarExcluirUsuario) {
     );
 
 }
-// ==============================
-// GRÁFICO DO DASHBOARD
-// ==============================
+
+
+// ==========================================
+// CONTROLE DO PERÍODO DO DASHBOARD
+// ==========================================
+
+let periodoGraficoDashboard = 7;
+
+
+// ==========================================
+// CARREGAR GRÁFICO DO DASHBOARD
+// ==========================================
 
 async function carregarGraficoDashboard() {
 
-    const grafico =
-        document.getElementById(
-            "graficoMovimentacoes"
-        );
+    const grafico = document.getElementById(
+        "graficoMovimentacoes"
+    );
 
     if (!grafico) {
         return;
@@ -5694,363 +5861,406 @@ async function carregarGraficoDashboard() {
 
     try {
 
-        const resposta =
-            await fetch("/api/movimentacoes");
+        // ==========================================
+        // BUSCAR MOVIMENTAÇÕES
+        // ==========================================
 
-        const movimentacoes =
-            await resposta.json();
+        const resposta = await fetch(
+            "/api/movimentacoes"
+        );
 
         if (!resposta.ok) {
             throw new Error(
-                movimentacoes.erro ||
                 "Não foi possível carregar o gráfico."
             );
         }
 
+        const movimentacoes = await resposta.json();
 
-        // ==============================
-        // CRIAR OS ÚLTIMOS 7 DIAS
-        // ==============================
 
-        const dias = [];
+        // ==========================================
+        // DEFINIR PERÍODO
+        // ==========================================
+
+        const periodo = [7, 30, 90].includes(
+            periodoGraficoDashboard
+        )
+            ? periodoGraficoDashboard
+            : 7;
 
         const hoje = new Date();
 
         hoje.setHours(0, 0, 0, 0);
 
+        const dataInicial = new Date(hoje);
 
-        for (let i = 6; i >= 0; i--) {
+        dataInicial.setDate(
+            hoje.getDate() - (periodo - 1)
+        );
 
-            const data = new Date(hoje);
 
-            data.setDate(
-                hoje.getDate() - i
+        // ==========================================
+        // FORMATAR DATAS
+        // ==========================================
+
+        function formatarChaveData(data) {
+
+            const ano = data.getFullYear();
+
+            const mes = String(
+                data.getMonth() + 1
+            ).padStart(2, "0");
+
+            const dia = String(
+                data.getDate()
+            ).padStart(2, "0");
+
+            return `${ano}-${mes}-${dia}`;
+
+        }
+
+        function formatarDataCurta(data) {
+
+            return data.toLocaleDateString(
+                "pt-BR",
+                {
+                    day: "2-digit",
+                    month: "2-digit"
+                }
             );
 
-            const ano =
-                data.getFullYear();
-
-            const mes =
-                String(
-                    data.getMonth() + 1
-                ).padStart(2, "0");
-
-            const dia =
-                String(
-                    data.getDate()
-                ).padStart(2, "0");
+        }
 
 
-            dias.push({
-                chave:
-                    `${ano}-${mes}-${dia}`,
+        // ==========================================
+        // DEFINIR AGRUPAMENTO
+        // ==========================================
 
-                label:
-                    `${dia}/${mes}`,
+        // 7 dias: agrupamento diário
+        // 30 dias: intervalos de 7 dias
+        // 90 dias: intervalos de 15 dias
+
+        let tamanhoGrupo = 1;
+
+        if (periodo === 30) {
+            tamanhoGrupo = 7;
+        }
+
+        if (periodo === 90) {
+            tamanhoGrupo = 15;
+        }
+
+
+        // ==========================================
+        // CRIAR GRUPOS DO GRÁFICO
+        // ==========================================
+
+        const grupos = [];
+
+        for (
+            let inicio = 0;
+            inicio < periodo;
+            inicio += tamanhoGrupo
+        ) {
+
+            const fim = Math.min(
+                inicio + tamanhoGrupo - 1,
+                periodo - 1
+            );
+
+            const dataInicioGrupo = new Date(
+                dataInicial
+            );
+
+            dataInicioGrupo.setDate(
+                dataInicial.getDate() + inicio
+            );
+
+            const dataFimGrupo = new Date(
+                dataInicial
+            );
+
+            dataFimGrupo.setDate(
+                dataInicial.getDate() + fim
+            );
+
+            const label = tamanhoGrupo === 1
+                ? formatarDataCurta(dataInicioGrupo)
+                : (
+                    `${formatarDataCurta(dataInicioGrupo)} - ` +
+                    `${formatarDataCurta(dataFimGrupo)}`
+                );
+
+            grupos.push({
+
+                inicio: formatarChaveData(
+                    dataInicioGrupo
+                ),
+
+                fim: formatarChaveData(
+                    dataFimGrupo
+                ),
+
+                label: label,
 
                 entradas: 0,
 
                 saidas: 0
+
             });
 
         }
 
 
-        // ==============================
-        // AGRUPAR MOVIMENTAÇÕES
-        // ==============================
+        // ==========================================
+        // CONTADORES DO PERÍODO
+        // ==========================================
 
-        movimentacoes.forEach(
-            movimentacao => {
+        let totalEntradasPeriodo = 0;
+        let totalSaidasPeriodo = 0;
 
-                if (!movimentacao.data_hora) {
-                    return;
-                }
-
-
-                // SQLite:
-                // 2026-09-23 10:30:00
-
-                const dataMovimentacao =
-                    movimentacao.data_hora
-                        .substring(0, 10);
+        let quantidadeEntradasPeriodo = 0;
+        let quantidadeSaidasPeriodo = 0;
 
 
-                const diaEncontrado =
-                    dias.find(
-                        item =>
-                            item.chave ===
-                            dataMovimentacao
-                    );
+        // ==========================================
+        // AGRUPAR MOVIMENTAÇÕES REAIS
+        // ==========================================
 
+        movimentacoes.forEach(movimentacao => {
 
-                if (!diaEncontrado) {
-                    return;
-                }
+            if (!movimentacao.data_hora) {
+                return;
+            }
 
+            // Formato esperado:
+            // 2026-09-23 10:30:00
 
-                const quantidade =
-                    Number(
-                        movimentacao.quantidade
-                    ) || 0;
+            const dataMovimentacao = String(
+                movimentacao.data_hora
+            ).substring(0, 10);
 
+            const grupo = grupos.find(item => {
 
-                if (
-                    movimentacao.tipo ===
-                    "entrada"
-                ) {
+                return (
+                    dataMovimentacao >= item.inicio &&
+                    dataMovimentacao <= item.fim
+                );
 
-                    diaEncontrado.entradas +=
-                        quantidade;
+            });
 
-                } else if (
-                    movimentacao.tipo ===
-                    "saida"
-                ) {
+            if (!grupo) {
+                return;
+            }
 
-                    diaEncontrado.saidas +=
-                        quantidade;
+            const quantidade = Number(
+                movimentacao.quantidade
+            ) || 0;
 
-                }
+            if (movimentacao.tipo === "entrada") {
+
+                grupo.entradas += quantidade;
+
+                totalEntradasPeriodo += quantidade;
+
+                quantidadeEntradasPeriodo++;
+
+            } else if (
+                movimentacao.tipo === "saida"
+            ) {
+
+                grupo.saidas += quantidade;
+
+                totalSaidasPeriodo += quantidade;
+
+                quantidadeSaidasPeriodo++;
 
             }
-        );
 
-// ==============================
-// RESUMO DOS ÚLTIMOS 7 DIAS
-// ==============================
-
-let totalEntradasPeriodo = 0;
-let totalSaidasPeriodo = 0;
-
-let quantidadeEntradasPeriodo = 0;
-let quantidadeSaidasPeriodo = 0;
+        });
 
 
-// Somar quantidades movimentadas
-dias.forEach(
-    dia => {
+        // ==========================================
+        // ATUALIZAR RESUMO DO DASHBOARD
+        // ==========================================
 
-        totalEntradasPeriodo +=
-            dia.entradas;
+        const periodoTotalEntradas =
+            document.getElementById(
+                "periodoTotalEntradas"
+            );
 
-        totalSaidasPeriodo +=
-            dia.saidas;
+        const periodoTotalSaidas =
+            document.getElementById(
+                "periodoTotalSaidas"
+            );
 
-    }
-);
+        const periodoQuantidadeEntradas =
+            document.getElementById(
+                "periodoQuantidadeEntradas"
+            );
 
+        const periodoQuantidadeSaidas =
+            document.getElementById(
+                "periodoQuantidadeSaidas"
+            );
 
-// Contar movimentações do período
-movimentacoes.forEach(
-    movimentacao => {
-
-        if (!movimentacao.data_hora) {
-            return;
-        }
-
-        const dataMovimentacao =
-            movimentacao.data_hora
-                .substring(0, 10);
-
-
-        const estaNoPeriodo =
-            dias.some(
-                dia =>
-                    dia.chave ===
-                    dataMovimentacao
+        const descricaoResumo =
+            document.getElementById(
+                "descricaoResumoDashboard"
             );
 
 
-        if (!estaNoPeriodo) {
-            return;
-        }
+        if (periodoTotalEntradas) {
 
-
-        if (
-            movimentacao.tipo ===
-            "entrada"
-        ) {
-
-            quantidadeEntradasPeriodo++;
-
-        } else if (
-            movimentacao.tipo ===
-            "saida"
-        ) {
-
-            quantidadeSaidasPeriodo++;
+            periodoTotalEntradas.textContent =
+                totalEntradasPeriodo;
 
         }
 
-    }
-);
+        if (periodoTotalSaidas) {
+
+            periodoTotalSaidas.textContent =
+                totalSaidasPeriodo;
+
+        }
+
+        if (periodoQuantidadeEntradas) {
+
+            periodoQuantidadeEntradas.textContent =
+                quantidadeEntradasPeriodo === 1
+                    ? "1 movimentação"
+                    : `${quantidadeEntradasPeriodo} movimentações`;
+
+        }
+
+        if (periodoQuantidadeSaidas) {
+
+            periodoQuantidadeSaidas.textContent =
+                quantidadeSaidasPeriodo === 1
+                    ? "1 movimentação"
+                    : `${quantidadeSaidasPeriodo} movimentações`;
+
+        }
+
+        if (descricaoResumo) {
+
+            descricaoResumo.textContent =
+                `Entradas e saídas dos últimos ${periodo} dias`;
+
+        }
 
 
-// ==============================
-// ATUALIZAR RESUMO
-// ==============================
-
-const periodoTotalEntradas =
-    document.getElementById(
-        "periodoTotalEntradas"
-    );
-
-const periodoTotalSaidas =
-    document.getElementById(
-        "periodoTotalSaidas"
-    );
-
-const periodoQuantidadeEntradas =
-    document.getElementById(
-        "periodoQuantidadeEntradas"
-    );
-
-const periodoQuantidadeSaidas =
-    document.getElementById(
-        "periodoQuantidadeSaidas"
-    );
-
-
-if (periodoTotalEntradas) {
-
-    periodoTotalEntradas.textContent =
-        totalEntradasPeriodo;
-
-}
-
-
-if (periodoTotalSaidas) {
-
-    periodoTotalSaidas.textContent =
-        totalSaidasPeriodo;
-
-}
-
-
-if (periodoQuantidadeEntradas) {
-
-    periodoQuantidadeEntradas.textContent =
-        quantidadeEntradasPeriodo === 1
-            ? "1 movimentação"
-            : `${quantidadeEntradasPeriodo} movimentações`;
-
-}
-
-
-if (periodoQuantidadeSaidas) {
-
-    periodoQuantidadeSaidas.textContent =
-        quantidadeSaidasPeriodo === 1
-            ? "1 movimentação"
-            : `${quantidadeSaidasPeriodo} movimentações`;
-
-}
-        // ==============================
-        // MAIOR VALOR
-        // ==============================
+        // ==========================================
+        // CALCULAR ESCALA DO GRÁFICO
+        // ==========================================
 
         const valores = [];
 
-        dias.forEach(
-            dia => {
-                valores.push(
-                    dia.entradas,
-                    dia.saidas
-                );
-            }
+        grupos.forEach(grupo => {
+
+            valores.push(
+                grupo.entradas,
+                grupo.saidas
+            );
+
+        });
+
+        const maiorValor = Math.max(
+            ...valores,
+            1
         );
 
 
-        const maiorValor =
-            Math.max(
-                ...valores,
-                1
-            );
-
-
-        // ==============================
-        // MONTAR GRÁFICO
-        // ==============================
+        // ==========================================
+        // PREPARAR GRÁFICO
+        // ==========================================
 
         grafico.innerHTML = "";
 
-
-        dias.forEach(
-            dia => {
-
-                const coluna =
-                    document.createElement(
-                        "div"
-                    );
-
-                coluna.className =
-                    "grafico-coluna";
+        grafico.style.minWidth = "";
 
 
-                const alturaEntrada =
-                    dia.entradas === 0
-                        ? 0
-                        : (
-                            dia.entradas /
-                            maiorValor
-                        ) * 100;
+        // ==========================================
+        // RENDERIZAR BARRAS
+        // ==========================================
+
+        grupos.forEach(grupo => {
+
+            const coluna = document.createElement(
+                "div"
+            );
+
+            coluna.className = "grafico-coluna";
+
+            const alturaEntrada =
+                (grupo.entradas / maiorValor) * 100;
+
+            const alturaSaida =
+                (grupo.saidas / maiorValor) * 100;
+
+            const barras = document.createElement(
+                "div"
+            );
+
+            barras.className = "grafico-barras";
 
 
-                const alturaSaida =
-                    dia.saidas === 0
-                        ? 0
-                        : (
-                            dia.saidas /
-                            maiorValor
-                        ) * 100;
+            // BARRA DE ENTRADA
+
+            const barraEntrada = document.createElement(
+                "div"
+            );
+
+            barraEntrada.className =
+                "grafico-barra entrada";
+
+            barraEntrada.style.height =
+                `${alturaEntrada}%`;
+
+            barraEntrada.title =
+                `Entradas: ${grupo.entradas}`;
 
 
-                coluna.innerHTML = `
+            // BARRA DE SAÍDA
 
-                    <div class="grafico-barras">
+            const barraSaida = document.createElement(
+                "div"
+            );
 
-                        <div
-                            class="grafico-barra entrada"
-                            style="
-                                height:
-                                ${alturaEntrada}%;
-                            "
-                            title="
-                                Entradas:
-                                ${dia.entradas}
-                            "
-                        ></div>
+            barraSaida.className =
+                "grafico-barra saida";
 
+            barraSaida.style.height =
+                `${alturaSaida}%`;
 
-                        <div
-                            class="grafico-barra saida"
-                            style="
-                                height:
-                                ${alturaSaida}%;
-                            "
-                            title="
-                                Saídas:
-                                ${dia.saidas}
-                            "
-                        ></div>
-
-                    </div>
+            barraSaida.title =
+                `Saídas: ${grupo.saidas}`;
 
 
-                    <span class="grafico-data">
-                        ${dia.label}
-                    </span>
+            // LEGENDA DE DATA
 
-                `;
+            const legenda = document.createElement(
+                "span"
+            );
+
+            legenda.className = "grafico-data";
+
+            legenda.textContent = grupo.label;
 
 
-                grafico.appendChild(
-                    coluna
-                );
+            // MONTAR COLUNA
 
-            }
-        );
+            barras.appendChild(barraEntrada);
+
+            barras.appendChild(barraSaida);
+
+            coluna.appendChild(barras);
+
+            coluna.appendChild(legenda);
+
+            grafico.appendChild(coluna);
+
+        });
 
 
     } catch (erro) {
@@ -6071,14 +6281,130 @@ if (periodoQuantidadeSaidas) {
 }
 
 
-// Carrega somente quando estiver no Dashboard
-if (
-    document.getElementById(
-        "graficoMovimentacoes"
-    )
-) {
+// ==========================================
+// INICIALIZAÇÃO AUTOMÁTICA DO GRÁFICO
+// ==========================================
 
+// Aguarda o carregamento do documento antes
+// de procurar os elementos do Dashboard.
+
+function inicializarGraficoDashboard() {
+
+    const grafico = document.getElementById(
+        "graficoMovimentacoes"
+    );
+
+    if (!grafico) {
+        return;
+    }
+
+    // Inicia com o período padrão de 7 dias.
+    periodoGraficoDashboard = 7;
+
+    // Atualiza o botão selecionado.
+    const botoes = document.querySelectorAll(
+        "#filtrosPeriodoDashboard .dashboard-filtro-btn"
+    );
+
+    botoes.forEach(botao => {
+
+        const ativo =
+            Number(botao.dataset.dias) === 7;
+
+        botao.classList.toggle(
+            "ativo",
+            ativo
+        );
+
+        botao.setAttribute(
+            "aria-pressed",
+            String(ativo)
+        );
+
+    });
+
+    // Carrega os dados automaticamente.
     carregarGraficoDashboard();
+
+}
+
+
+// Executa quando o HTML estiver disponível.
+
+if (document.readyState === "loading") {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        inicializarGraficoDashboard,
+        { once: true }
+    );
+
+} else {
+
+    inicializarGraficoDashboard();
+
+}
+
+
+// ==========================================
+// SPRINT 07 - EVENTOS DOS FILTROS
+// ==========================================
+
+const filtrosPeriodoDashboard =
+    document.getElementById(
+        "filtrosPeriodoDashboard"
+    );
+
+if (filtrosPeriodoDashboard) {
+
+    const botoesPeriodo =
+        filtrosPeriodoDashboard.querySelectorAll(
+            ".dashboard-filtro-btn"
+        );
+
+    botoesPeriodo.forEach(botao => {
+
+        botao.addEventListener("click", async function () {
+
+            const dias = Number(this.dataset.dias);
+
+            if (![7, 30, 90].includes(dias)) {
+                return;
+            }
+
+            periodoGraficoDashboard = dias;
+
+            botoesPeriodo.forEach(item => {
+
+                const selecionado = item === this;
+
+                item.classList.toggle(
+                    "ativo",
+                    selecionado
+                );
+
+                item.setAttribute(
+                    "aria-pressed",
+                    String(selecionado)
+                );
+
+            });
+
+            const descricao =
+                document.getElementById(
+                    "descricaoResumoDashboard"
+                );
+
+            if (descricao) {
+                descricao.textContent =
+                    `Entradas e saídas dos últimos ${dias} dias`;
+            }
+
+            await carregarGraficoDashboard();
+
+        });
+
+    });
 
 }
 

@@ -221,6 +221,31 @@ Dashboard | EasyStock
 
                 </div>
 
+
+                <!-- ==============================
+                     SPRINT 07
+                     FILTROS RÁPIDOS DE PERÍODO
+                     ============================== -->
+
+                <div class="dashboard-filtros-periodo" id="filtrosPeriodoDashboard" role="group"
+                    aria-label="Selecionar período do gráfico">
+
+                    <button type="button" class="dashboard-filtro-btn ativo" data-dias="7" aria-pressed="true">
+                        7 dias
+                    </button>
+
+
+                    <button type="button" class="dashboard-filtro-btn" data-dias="30" aria-pressed="false">
+                        30 dias
+                    </button>
+
+
+                    <button type="button" class="dashboard-filtro-btn" data-dias="90" aria-pressed="false">
+                        90 dias
+                    </button>
+
+                </div>
+
             </div>
 
 
@@ -346,8 +371,15 @@ Dashboard | EasyStock
                 <div>
 
                     <h2>
-                        Resumo do período
+                        Resumo geral de movimentações
                     </h2>
+
+                    <!-- SPRINT 07:
+                         TEXTO ATUALIZADO PELO FILTRO -->
+
+                    <p id="descricaoResumoDashboard">
+                        Entradas e saídas dos últimos 7 dias
+                    </p>
 
                 </div>
 

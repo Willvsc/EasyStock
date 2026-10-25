@@ -48,7 +48,7 @@
                         autocomplete="email"
                         required
                     >
-
+<small id="erroEmail" class="login-campo-erro" aria-live="polite"></small>
                 </div>
 
 
@@ -58,14 +58,20 @@
                         Senha
                     </label>
 
-                    <input
-                        type="password"
-                        id="senha"
-                        placeholder="Digite sua senha"
-                        autocomplete="current-password"
-                        required
-                    >
-
+                    <div class="login-senha-container">
+                    
+                        <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="current-password" required>
+                    
+                        <button type="button" id="btnMostrarSenha" class="login-mostrar-senha" aria-label="Mostrar senha"
+                            aria-pressed="false" title="Mostrar senha">
+                            <svg id="iconeSenha" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    
+                    </div>
                 </div>
 
 
@@ -75,11 +81,10 @@
                 ></p>
 
 
-                <button
-                    type="submit"
-                    class="login-button"
-                >
-                    Entrar
+                <button type="submit" id="btnEntrar" class="login-button">
+                    <span id="textoBotaoLogin">Entrar</span>
+                
+                    <span id="spinnerLogin" class="login-spinner" aria-hidden="true" hidden></span>
                 </button>
 
             </form>
@@ -91,28 +96,136 @@
 
     <script>
 
+        const campoSenha = document.getElementById("senha");
+            const btnMostrarSenha = document.getElementById("btnMostrarSenha");
+            const iconeSenha = document.getElementById("iconeSenha");
+
+            btnMostrarSenha.addEventListener("click", function () {
+
+                const senhaVisivel = campoSenha.type === "password";
+
+                campoSenha.type = senhaVisivel ? "text" : "password";
+
+                btnMostrarSenha.setAttribute(
+                    "aria-label",
+                    senhaVisivel ? "Ocultar senha" : "Mostrar senha"
+                );
+
+                btnMostrarSenha.setAttribute(
+                    "aria-pressed",
+                    String(senhaVisivel)
+                );
+
+                btnMostrarSenha.title =
+                    senhaVisivel ? "Ocultar senha" : "Mostrar senha";
+
+                iconeSenha.innerHTML = senhaVisivel
+                    ? `
+            <path d="M3 3l18 18"/>
+            <path d="M10.6 5.1A11.4 11.4 0 0 1 12 5c6.5 0 10 7 10 7a14 14 0 0 1-3.1 3.8"/>
+            <path d="M6.2 6.2C3.5 8.1 2 12 2 12s3.5 7 10 7a10.5 10.5 0 0 0 4.1-.8"/>
+        `
+                    : `
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+            <circle cx="12" cy="12" r="3"/>
+        `;
+
+            });        
+
         const formLogin =
             document.getElementById("formLogin");
 
         const erroLogin =
             document.getElementById("erroLogin");
 
+            // ==========================================
+                // SPRINT 07 - VALIDAÇÃO VISUAL DO LOGIN
+                // ==========================================
 
-        formLogin.addEventListener(
+                const campoEmail = document.getElementById("email");
+                const campoSenhaLogin = document.getElementById("senha");
+                const erroEmail = document.getElementById("erroEmail");
+
+                function validarEmail() {
+                    const email = campoEmail.value.trim();
+
+                    if (email === "") {
+                        campoEmail.classList.remove("campo-invalido");
+                        erroEmail.textContent = "";
+                        return false;
+                    }
+
+                    if (!campoEmail.validity.valid) {
+                        campoEmail.classList.add("campo-invalido");
+                        erroEmail.textContent = "Digite um endereço de e-mail válido.";
+                        return false;
+                    }
+
+                    campoEmail.classList.remove("campo-invalido");
+                    erroEmail.textContent = "";
+
+                    return true;
+                }
+
+                campoEmail.addEventListener("input", function () {
+                    validarEmail();
+
+                    campoSenhaLogin.classList.remove("campo-invalido");
+                    erroLogin.textContent = "";
+                });
+
+                campoSenhaLogin.addEventListener("input", function () {
+                    campoSenhaLogin.classList.remove("campo-invalido");
+                    campoEmail.classList.remove("campo-invalido");
+                    erroLogin.textContent = "";
+                });
+
+                // ==========================================
+                    // SPRINT 07 - LOADING DA AUTENTICAÇÃO
+                    // ==========================================
+
+                    const btnEntrar = document.getElementById("btnEntrar");
+                    const textoBotaoLogin = document.getElementById("textoBotaoLogin");
+                    const spinnerLogin = document.getElementById("spinnerLogin");
+
+                    let loginEmAndamento = false;
+
+                    function definirLoadingLogin(ativo) {
+                        loginEmAndamento = ativo;
+
+                        btnEntrar.disabled = ativo;
+                        btnEntrar.setAttribute("aria-busy", String(ativo));
+
+                        textoBotaoLogin.textContent = ativo
+                            ? "Entrando..."
+                            : "Entrar";
+
+                        spinnerLogin.hidden = !ativo;
+                    }
+       formLogin.addEventListener(
             "submit",
             async function (event) {
 
                 event.preventDefault();
 
+                // Evita múltiplas tentativas simultâneas
+                if (loginEmAndamento) {
+                    return;
+                }
+
                 erroLogin.textContent = "";
 
+                // Validação do e-mail
+                if (!validarEmail()) {
+                    campoEmail.focus();
+                    return;
+                }
 
-                const email =
-                    document.getElementById("email").value;
+                const email = campoEmail.value.trim();
+                const senha = campoSenhaLogin.value;
 
-                const senha =
-                    document.getElementById("senha").value;
-
+                // Ativa o loading do botão
+                definirLoadingLogin(true);
 
                 try {
 
@@ -122,8 +235,7 @@
                             method: "POST",
 
                             headers: {
-                                "Content-Type":
-                                    "application/json"
+                                "Content-Type": "application/json"
                             },
 
                             body: JSON.stringify({
@@ -133,29 +245,45 @@
                         }
                     );
 
+                    const dados = await resposta.json();
 
-                    const dados =
-                        await resposta.json();
-
-
+                    // Credenciais incorretas ou erro de autenticação
                     if (!resposta.ok) {
 
                         erroLogin.textContent =
                             dados.erro ||
                             "Não foi possível realizar o login.";
 
+                        if (
+                            resposta.status === 400 ||
+                            resposta.status === 401
+                        ) {
+                            campoEmail.classList.add("campo-invalido");
+                            campoSenhaLogin.classList.add("campo-invalido");
+                        }
+
                         return;
                     }
 
+                    // Ativa a notificação de boas-vindas
+                    sessionStorage.setItem(
+                        "easyStockBoasVindas",
+                        "1"
+                    );
 
+                    // Redireciona para o Dashboard
                     window.location.href = "/";
 
-                }
-
-                catch (erro) {
+                } catch (erro) {
 
                     erroLogin.textContent =
                         "Erro ao conectar com o servidor.";
+
+                } finally {
+
+                    // Desativa o loading em caso de erro.
+                    // Em caso de sucesso, a página será redirecionada.
+                    definirLoadingLogin(false);
 
                 }
 
