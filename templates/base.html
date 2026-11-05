@@ -179,6 +179,17 @@
     }
     </script>
 
+    <!-- EasyStock AI: painel reutilizado nas páginas autenticadas -->
+    <button type="button" id="aiToggle" class="ai-toggle" aria-controls="aiPanel" aria-expanded="false" aria-label="Abrir EasyStock AI">✦ EasyStock AI</button>
+    <section id="aiPanel" class="ai-panel" role="dialog" aria-modal="false" aria-label="Assistente EasyStock AI" hidden>
+        <div class="ai-header"><strong>✦ EasyStock AI</strong><button id="aiClose" type="button" aria-label="Fechar chatbot">×</button></div>
+        <div class="ai-mode"><label for="aiMode">Modo de atendimento</label><select id="aiMode" aria-label="Modo do EasyStock AI"><option value="local">Local — sem créditos</option><option value="openai">OpenAI Cloud — requer créditos</option></select></div>
+        <div class="ai-messages" id="aiMessages" role="log" aria-live="polite"><p class="ai-bubble ai-bot">Olá! Posso consultar produtos, preços, quantidades e movimentações. Nesta primeira etapa não realizo alterações no estoque.</p></div>
+        <form id="aiForm" class="ai-form"><label class="ai-sr" for="aiInput">Sua pergunta</label><input id="aiInput" maxlength="500" autocomplete="off" placeholder="Pergunte sobre seu estoque..." required><button type="submit" id="aiSend">Enviar</button></form>
+        <small class="ai-notice">Consultas somente leitura • Respostas baseadas no estoque</small>
+    </section>
+    <link rel="stylesheet" href="{{ url_for('static', filename='easystock-ai.css') }}">
+    <script defer src="{{ url_for('static', filename='easystock-ai.js') }}"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 
     <script>

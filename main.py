@@ -1808,6 +1808,28 @@ def excluir_usuario(usuario_id):
 # LISTAR PRODUTOS
 # ==============================
 
+# SPRINT 08 - EasyStock AI (etapa 1: consultas somente leitura)
+@app.route("/api/ai/chat", methods=["POST"])
+def easystock_ai_chat():
+    if "usuario_id" not in session:
+        return jsonify({"erro": "Usuário não autenticado."}), 401
+    if not request.is_json:
+        return jsonify({"erro": "Envie uma mensagem JSON."}), 400
+    dados = request.get_json(silent=True) or {}
+    mensagem = dados.get("mensagem", "")
+    if not isinstance(mensagem, str) or not mensagem.strip() or len(mensagem) > 500:
+        return jsonify({"erro": "A mensagem deve conter entre 1 e 500 caracteres."}), 400
+    modo = dados.get("modo", "local")
+    if modo not in ("local", "openai"):
+        return jsonify({"erro": "Modo inválido. Escolha local ou openai."}), 400
+    from easystock_ai.assistant import AIError, responder
+    try:
+        resposta = responder(mensagem.strip(), conectar_banco, modo=modo)
+        return jsonify({"resposta": resposta, "modo": modo, "somente_leitura": True})
+    except AIError as exc:
+        return jsonify({"erro": str(exc)}), 503
+
+
 @app.route("/api/produtos", methods=["GET"])
 def listar_produtos():
 
