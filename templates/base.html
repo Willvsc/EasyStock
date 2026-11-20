@@ -12,13 +12,14 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='visual-final.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile-layout.css') }}">
 </head>
 
 <body>
 
     <!-- SIDEBAR -->
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="menuLateral" aria-label="Menu principal">
 
         <div class="sidebar-logo">
 
@@ -97,6 +98,8 @@
     </aside>
 
 
+    <button type="button" class="mobile-menu-overlay" id="menuOverlay" aria-label="Fechar menu" tabindex="-1" hidden></button>
+
     <!-- ÁREA PRINCIPAL -->
 
     <div class="app-conteudo">
@@ -104,6 +107,7 @@
         <!-- CABEÇALHO -->
 
         <header class="topbar">
+            <button type="button" class="mobile-menu-toggle" id="menuToggle" aria-controls="menuLateral" aria-expanded="false" aria-label="Abrir menu de navegação">☰</button>
 
             <div class="topbar-estabelecimento">
 
@@ -191,6 +195,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='easystock-ai.css') }}">
     <script defer src="{{ url_for('static', filename='easystock-ai.js') }}"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='mobile-layout.js') }}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
