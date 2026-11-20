@@ -1833,6 +1833,9 @@ def easystock_ai_chat():
 @app.route("/api/produtos", methods=["GET"])
 def listar_produtos():
 
+    if "usuario_id" not in session:
+        return jsonify({"erro": "Usuário não autenticado."}), 401
+
     conn = conectar_banco()
 
     produtos = conn.execute("""
@@ -1863,6 +1866,9 @@ def listar_produtos():
 
 @app.route("/api/categorias", methods=["GET"])
 def listar_categorias():
+
+    if "usuario_id" not in session:
+        return jsonify({"erro": "Usuário não autenticado."}), 401
 
     conn = conectar_banco()
 

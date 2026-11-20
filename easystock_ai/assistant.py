@@ -63,9 +63,9 @@ def consultar(conn, intent, termo, tipo, dias):
         if not rows: return "Nenhuma categoria cadastrada."
         return "Categorias cadastradas:\n" + "\n".join("• " + r["nome"] for r in rows[:MAX_RESULTADOS]) + ("\nExibindo as 15 primeiras categorias." if len(rows) > MAX_RESULTADOS else "")
     if intent == "baixo":
-        rows = conn.execute("SELECT nome, sku, quantidade FROM produtos WHERE quantidade < 5 ORDER BY quantidade ASC, nome COLLATE NOCASE LIMIT ?", (MAX_RESULTADOS + 1,)).fetchall()
-        if not rows: return "Nenhum produto com estoque abaixo de 5 unidades."
-        return "Produtos com estoque abaixo de 5 unidades:\n" + "\n".join(f"• {r['nome']} (SKU {r['sku']}): {r['quantidade']} un." for r in rows[:MAX_RESULTADOS]) + ("\nExibindo apenas os 15 primeiros." if len(rows) > MAX_RESULTADOS else "")
+        rows = conn.execute("SELECT nome, sku, quantidade FROM produtos WHERE quantidade BETWEEN 1 AND 5 ORDER BY quantidade ASC, nome COLLATE NOCASE LIMIT ?", (MAX_RESULTADOS + 1,)).fetchall()
+        if not rows: return "Nenhum produto com estoque baixo (entre 1 e 5 unidades)."
+        return "Produtos com estoque baixo (entre 1 e 5 unidades):\n" + "\n".join(f"• {r['nome']} (SKU {r['sku']}): {r['quantidade']} un." for r in rows[:MAX_RESULTADOS]) + ("\nExibindo apenas os 15 primeiros." if len(rows) > MAX_RESULTADOS else "")
     if intent == "resumo":
         r = conn.execute("SELECT COUNT(*) AS produtos, COALESCE(SUM(quantidade), 0) AS unidades FROM produtos").fetchone()
         return f"O estoque possui {r['produtos']} produtos cadastrados e {r['unidades']} unidades no total."
