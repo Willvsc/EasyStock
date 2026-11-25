@@ -1,156 +1,35 @@
-# 📦 EasyStock
+# EasyStock — Release Candidate 1 (Sprint 10)
 
-Sistema web de gerenciamento de estoque desenvolvido com Python, Flask e SQLite.
+Sistema web de gestão de estoque para pequenos estabelecimentos. Centraliza produtos, categorias, movimentações, histórico, indicadores, relatórios PDF/CSV e usuários. O EasyStock AI Local interpreta consultas e calcula consumo, cobertura, ranking e recomendações de reposição, sem alterar o banco.
 
-O EasyStock permite o gerenciamento de produtos, categorias, movimentações de estoque e usuários, contando com autenticação e controle de acesso por perfil.
+## Tecnologias e requisitos
+Python 3.11 ou superior, Flask, SQLite, ReportLab, HTML, CSS e JavaScript. Navegador moderno. Git é opcional para execução. Internet necessária para instalar dependências e para o modo OpenAI Cloud opcional.
 
-## 🚀 Funcionalidades
-
-- Login e logout de usuários
-- Autenticação com sessão
-- Senhas armazenadas com hash
-- Controle de acesso por perfil
-- Perfis Administrador e Funcionário
-- Cadastro e listagem de usuários
-- Cadastro de produtos
-- Consulta de produtos
-- Edição de produtos
-- Exclusão de produtos
-- Controle de entrada e saída de estoque
-- Histórico de movimentações
-- Gerenciamento de categorias
-- Dashboard com informações do estoque
-- Persistência de dados com SQLite
-
-## 🛠️ Tecnologias utilizadas
-
-- Python
-- Flask
-- SQLite
-- HTML
-- CSS
-- JavaScript
-- Werkzeug
-
-## 📁 Estrutura do projeto
-
-```text
-sistema-estoque/
-│
-├── database/
-│   └── schema.sql
-│
-├── static/
-│   ├── app.js
-│   └── style.css
-│
-├── templates/
-│   ├── index.html
-│   └── login.html
-│
-├── main.py
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
-## 💻 Executando o projeto localmente
-
-### 1. Clonar o repositório
-
-```bash
-git clone https://github.com/Willvsc/EasyStock.git
-```
-
-Entre na pasta:
-
-```bash
-cd EasyStock
-```
-
-### 2. Criar o ambiente virtual
-
-No Windows:
-
+## Instalação no Windows (PowerShell)
+Na pasta extraída, execute:
 ```powershell
-python -m venv venv
-```
-
-### 3. Ativar o ambiente virtual
-
-No PowerShell:
-
-```powershell
+py -m venv venv
 .\venv\Scripts\Activate.ps1
-```
-
-### 4. Instalar as dependências
-
-```powershell
-pip install -r requirements.txt
-```
-
-### 5. Executar o sistema
-
-```powershell
+python -m pip install -r requirements.txt
 python main.py
 ```
+Abra http://127.0.0.1:5000. O servidor é local, sem debug. O banco `estoque.db` é criado automaticamente se não existir. Em banco novo, o administrador `admin@easystock.com` recebe uma senha aleatória exibida uma única vez no terminal; alternativamente defina `$env:EASYSTOCK_ADMIN_PASSWORD` antes da primeira execução. Bancos existentes preservam suas contas e senhas. Não publique o banco nem senhas. Faça backup antes de iniciar uma atualização.
 
-Na primeira execução, o EasyStock cria automaticamente o banco de dados SQLite, as tabelas necessárias, os perfis padrão, as categorias padrão e o usuário Administrador inicial.
+Variáveis opcionais: `SECRET_KEY` (segredo forte para manter sessões entre reinícios; sem ele é gerado um segredo por processo), `EASYSTOCK_DATABASE` (caminho do SQLite), `OPENAI_API_KEY` e `EASYSTOCK_AI_MODEL` (modo Cloud). Não versionar segredos. O modo Cloud depende de créditos e ainda precisa de validação ponta a ponta.
 
-### 6. Acessar no navegador
+## Banco e testes
+`database/schema.sql` documenta a estrutura de instalação nova; `main.py` inicializa e migra bancos existentes. Execute `python verificar_banco.py` para auditar integridade e relacionamentos. Execute `python -m unittest test_easystock test_ai_sprint09 test_sprint10 -v` para regressão. A suíte não substitui a revisão visual e funcional manual.
 
-Abra:
+## Estrutura
+- `main.py`: servidor, autenticação, APIs, migrações e relatórios.
+- `database/schema.sql`: esquema SQLite.
+- `templates/`, `static/`: interface e responsividade.
+- `easystock_ai/`: interpretação e análise somente leitura.
+- `docs/API.md`: contrato das APIs e exemplos.
+- `docs/VALIDACAO_RC1.md`: roteiro de homologação.
+- `test_*.py`: testes automatizados.
 
-```text
-http://127.0.0.1:5000
-```
+## Equipe
+Willian Barbosa Vasconcelos — Ciência da Computação, UNINASSAU, turma 8NA — Scrum Master e desenvolvedor.
 
-## 🔐 Acesso inicial
-
-Na primeira execução, utilize:
-
-```text
-E-mail: admin@easystock.com
-Senha: Admin123
-```
-
-O Administrador possui acesso ao gerenciamento de usuários e às funcionalidades de estoque.
-
-O perfil Funcionário possui acesso às operações de estoque, sem acesso ao gerenciamento de usuários.
-
-> As credenciais acima são destinadas ao ambiente local de desenvolvimento.
-
-## 🗄️ Banco de dados
-
-O projeto utiliza SQLite.
-
-O arquivo local:
-
-```text
-estoque.db
-```
-
-não é versionado no GitHub.
-
-Ao iniciar o sistema pela primeira vez, o banco é criado automaticamente pelo EasyStock.
-
-O projeto também possui o modelo SQL em:
-
-```text
-database/schema.sql
-```
-
-## 👥 Perfis de acesso
-
-### Administrador
-
-Possui acesso às funcionalidades de estoque e ao gerenciamento de usuários.
-
-### Funcionário
-
-Possui acesso às operações de estoque, mas não possui permissão para acessar o gerenciamento de usuários.
-
-## 📌 Projeto acadêmico
-
-Projeto desenvolvido para fins acadêmicos como sistema de gerenciamento de estoque.
+Repositório: https://github.com/Willvsc/EasyStock

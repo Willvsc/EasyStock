@@ -3,6 +3,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import os
 import re
+import math
+import secrets
+from pathlib import Path
 
 from datetime import datetime
 
@@ -27,10 +30,11 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get(
     "SECRET_KEY",
-    "easystock-chave-local-desenvolvimento"
+    secrets.token_hex(32)
 )
 
-DATABASE = "estoque.db"
+DATABASE = os.environ.get("EASYSTOCK_DATABASE", str(Path(__file__).resolve().parent / "estoque.db"))
+app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
 
 # ==============================
 # CONEXÃO COM O BANCO
@@ -242,6 +246,31 @@ def inicializar_banco():
         """)
 
 
+    # RC1: normalizar vínculo de usuário em bancos legados.
+    if not any(row["from"] == "usuario_id" for row in conn.execute("PRAGMA foreign_key_list(movimentacoes)")):
+        conn.execute("SAVEPOINT rc10_fk")
+        try:
+            conn.execute("ALTER TABLE movimentacoes RENAME TO movimentacoes_rc10_antiga")
+            conn.execute("""CREATE TABLE movimentacoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, produto_id INTEGER,
+                produto_nome TEXT, tipo TEXT NOT NULL, quantidade INTEGER NOT NULL,
+                data_hora TEXT NOT NULL, usuario_id INTEGER, valor_unitario REAL, valor_total REAL,
+                FOREIGN KEY(produto_id) REFERENCES produtos(id) ON DELETE SET NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuario(id) ON DELETE SET NULL)""")
+            conn.execute("""INSERT INTO movimentacoes SELECT id, produto_id, produto_nome,
+                tipo, quantidade, data_hora, usuario_id, valor_unitario, valor_total
+                FROM movimentacoes_rc10_antiga""")
+            conn.execute("DROP TABLE movimentacoes_rc10_antiga")
+            conn.execute("RELEASE rc10_fk")
+        except Exception:
+            conn.execute("ROLLBACK TO rc10_fk")
+            conn.execute("RELEASE rc10_fk")
+            conn.close()
+            raise
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_mov_data ON movimentacoes(data_hora)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_mov_produto ON movimentacoes(produto_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_prod_categoria ON produtos(categoria_id)")
+
     # ==============================
     # PERFIS PADRÃO
     # ==============================
@@ -318,17 +347,18 @@ def inicializar_banco():
     administrador = conn.execute("""
         SELECT id
         FROM usuario
-        WHERE email = ?
+        WHERE perfil_id = ?
     """, (
-        "admin@easystock.com",
+        perfil_admin["id"],
     )).fetchone()
 
 
     if perfil_admin and not administrador:
 
-        senha_admin = generate_password_hash(
-            "Admin123"
-        )
+        senha_inicial = os.environ.get("EASYSTOCK_ADMIN_PASSWORD") or secrets.token_urlsafe(15)
+        senha_admin = generate_password_hash(senha_inicial)
+        if not os.environ.get("EASYSTOCK_ADMIN_PASSWORD"):
+            print("Senha inicial do administrador (guarde em local seguro):", senha_inicial)
 
         conn.execute("""
             INSERT INTO usuario (
@@ -1537,7 +1567,11 @@ def editar_usuario(usuario_id):
             "erro": "Acesso permitido apenas para administradores."
         }), 403
 
-    dados = request.get_json() or {}
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
 
     nome = dados.get("nome", "").strip()
     email = dados.get("email", "").strip().lower()
@@ -1815,7 +1849,11 @@ def easystock_ai_chat():
         return jsonify({"erro": "Usuário não autenticado."}), 401
     if not request.is_json:
         return jsonify({"erro": "Envie uma mensagem JSON."}), 400
-    dados = request.get_json(silent=True) or {}
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
     mensagem = dados.get("mensagem", "")
     if not isinstance(mensagem, str) or not mensagem.strip() or len(mensagem) > 500:
         return jsonify({"erro": "A mensagem deve conter entre 1 e 500 caracteres."}), 400
@@ -1923,7 +1961,11 @@ def adicionar_produto():
             "erro":
                 "Você não possui permissão para cadastrar produtos."
         }), 403
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
 
     nome = dados.get("nome", "").strip()
     categoria = dados.get("categoria", "").strip()
@@ -1957,9 +1999,11 @@ def adicionar_produto():
     try:
 
         preco = float(preco)
+        if isinstance(quantidade, bool) or (isinstance(quantidade, float) and not quantidade.is_integer()):
+            raise ValueError("Quantidade inteira obrigatória")
         quantidade = int(quantidade)
 
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
 
         return jsonify({
             "erro": "Preço ou quantidade inválidos."
@@ -1969,7 +2013,7 @@ def adicionar_produto():
     # Impedir valores negativos
 
    
-    if preco <= 0:
+    if not math.isfinite(preco) or preco <= 0:
 
         return jsonify({
         "erro": "O preço deve ser maior que zero."
@@ -2068,7 +2112,11 @@ def editar_produto(produto_id):
             "erro":
                 "Você não possui permissão para editar produtos."
         }), 403
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
 
     nome = dados.get("nome", "").strip()
     categoria = dados.get("categoria", "").strip()
@@ -2103,7 +2151,7 @@ def editar_produto(produto_id):
 
         preco = float(preco)
 
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
 
         return jsonify({
             "erro": "Preço inválido."
@@ -2112,7 +2160,7 @@ def editar_produto(produto_id):
 
     # Impedir preço negativo
 
-    if preco <= 0:
+    if not math.isfinite(preco) or preco <= 0:
 
         return jsonify({
         "erro": "O preço deve ser maior que zero."
@@ -2230,7 +2278,11 @@ def alterar_quantidade(produto_id):
         }), 401
 
 
-    dados = request.get_json() or {}
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
 
     operacao = dados.get("operacao")
 
@@ -2259,9 +2311,11 @@ def alterar_quantidade(produto_id):
 
     try:
 
+        if isinstance(quantidade, bool) or (isinstance(quantidade, float) and not quantidade.is_integer()):
+            raise ValueError("Quantidade inteira obrigatória")
         quantidade = int(quantidade)
 
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
 
         return jsonify({
             "erro":
@@ -2278,6 +2332,7 @@ def alterar_quantidade(produto_id):
 
 
     conn = conectar_banco()
+    conn.execute("BEGIN IMMEDIATE")
 
 
     # ==============================
@@ -2522,7 +2577,11 @@ def adicionar_categoria():
                 "Você não possui permissão para cadastrar categorias."
         }), 403
 
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
 
     nome = dados.get("nome", "").strip()
 
@@ -2589,7 +2648,11 @@ def editar_categoria(categoria_id):
                 "Você não possui permissão para editar categorias."
         }), 403
 
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
 
     nome = dados.get("nome", "").strip()
 
@@ -2932,7 +2995,8 @@ def relatorio_movimentacoes():
                 "Não foi possível gerar "
                 "o relatório solicitado."
         }), 500
-def relatorio_movimentacoes():
+@app.route("/api/relatorios/movimentacoes/dados", methods=["GET"])
+def relatorio_movimentacoes_dados():
 
     # ==============================
     # AUTENTICAÇÃO
@@ -3981,7 +4045,11 @@ def cadastrar_usuario():
             "erro": "Acesso permitido apenas para administradores."
         }), 403
 
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
 
     nome = dados.get("nome", "").strip()
     email = dados.get("email", "").strip().lower()
@@ -4121,7 +4189,11 @@ def listar_usuarios():
 @app.route("/api/login", methods=["POST"])
 def login():
 
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Envie um objeto JSON válido."}), 400
+    if any(k in dados and not isinstance(dados[k], str) for k in ("nome", "categoria", "sku", "email", "senha")):
+        return jsonify({"erro": "Campos de texto inválidos."}), 400
 
     email = dados.get("email", "").strip().lower()
     senha = dados.get("senha", "")
@@ -4487,5 +4559,5 @@ if __name__ == "__main__":
     migrar_relatorios_antigos()
 
     app.run(
-        debug=True
+        host="127.0.0.1", debug=False
     )

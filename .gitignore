@@ -18,3 +18,5 @@ env/
 
 # Relatórios PDF gerados pelo sistema
 relatorios/
+.env
+.env.*

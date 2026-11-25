@@ -44,3 +44,9 @@
 @media (prefers-reduced-motion: reduce) {
   body .sidebar { transition: none; }
 }
+/* RC1: preserve horizontal table access and keyboard focus. */
+@media (max-width: 800px) {
+  body .pagina-conteudo { padding-bottom: 84px; }
+  body .tabela-container, body .table-responsive, body .tabela-responsiva, body .table-wrapper { overscroll-behavior-x: contain; }
+}
+:where(button, a, input, select, textarea):focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
